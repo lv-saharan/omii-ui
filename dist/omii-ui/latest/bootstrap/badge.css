@@ -1,0 +1,6 @@
+/*!
+ * Bootstrap  v5.2.0 (https://getbootstrap.com/)
+ * Copyright 2011-2022 The Bootstrap Authors
+ * Copyright 2011-2022 Twitter, Inc.
+ * Licensed under MIT (https://github.com/twbs/bootstrap/blob/main/LICENSE)
+ */.badge{--oi-badge-padding-x: .65em;--oi-badge-padding-y: .35em;--oi-badge-font-size: .75em;--oi-badge-font-weight: 700;--oi-badge-color: #fff;--oi-badge-border-radius: .375rem;display:inline-block;padding:var(--oi-badge-padding-y) var(--oi-badge-padding-x);font-size:var(--oi-badge-font-size);font-weight:var(--oi-badge-font-weight);line-height:1;color:var(--oi-badge-color);text-align:center;white-space:nowrap;vertical-align:baseline;border-radius:var(--oi-badge-border-radius)}.badge:empty{display:none}.btn .badge{position:relative;top:-1px}

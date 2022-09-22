@@ -1,0 +1,18 @@
+.info {
+    .page-link {
+        border-color: transparent;
+        .total{
+            color:var(--oi-gray-dark);
+        }
+    }
+}
+
+.jumper {
+    margin: 0 .5rem;
+
+    .page-link {
+        padding: 0;
+        border-color: transparent;
+
+    }
+}

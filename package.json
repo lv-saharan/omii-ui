@@ -1,0 +1,28 @@
+{
+  "name": "omii-ui",
+  "version": "1.0.0",
+  "description": "",
+  "type": "module",
+  "scripts": {
+    "dev": "node esbuild.js dev",
+    "build:all":"npm-run-all -s build:prod gen:icons build:icons build:loadings build:css build:coder",
+    "build:prod": "node esbuild.js prod",
+    "build:icons": "node ./src/icon/esbuild.js",
+    "build:loadings": "node ./src/loading/esbuild.js",
+    "build:css": "node ./src/bootstrap/esbuild.js",
+    "build:coder": "node ./src/coder/esbuild.js",
+    "gen:icons": "node ./src/icon/scripts/gen-icons.js"
+  },
+  "devDependencies": {
+    "esbuild": "^0.14.49",
+    "esbuild-sass-plugin": "^2.3.0",
+    "jquery": "^3.6.0",
+    "jsdom": "^20.0.0"
+  },
+  "dependencies": {
+    "@floating-ui/dom": "^1.0.1",
+    "@material-design-icons/svg": "^0.11.5",
+    "bootstrap": "^5.2.0",
+    "monaco-editor": "^0.34.0"
+  }
+}

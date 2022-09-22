@@ -1,0 +1,32 @@
+:host {
+    --oi-heading-color: black;
+    position: relative;
+
+    .tooltip {
+        position: absolute;
+        width: max-content;
+        display: none;
+    }
+
+    .tooltip.show {
+        display: block;
+    }
+
+    .tooltip-arrow {
+        position: absolute;
+    }
+
+    slot:not([name]) {
+        position: relative;
+        display: inline-block;
+    }
+
+
+    slot[name=body] {
+        display: block;
+        min-width: fit-content;
+    }
+
+
+
+}

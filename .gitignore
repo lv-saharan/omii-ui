@@ -1,0 +1,11 @@
+node_modules
+src/icon/icons/filled
+src/icon/icons/outlined
+src/icon/icons/round
+src/icon/icons/sharp
+src/icon/icons/two-tone
+src/icon/icons/filled.jsx
+src/icon/icons/outlined.jsx
+src/icon/icons/round.jsx
+src/icon/icons/sharp.jsx
+src/icon/icons/two-tone.jsx

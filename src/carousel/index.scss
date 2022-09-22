@@ -1,0 +1,24 @@
+:host {
+    display: block;
+
+    slot {
+        display: block;
+    }
+
+    slot[name=indicators] {
+        button {
+            padding: .2rem;
+            border: 0;
+            margin: 0 .2rem;
+            width:0;
+            background-color: white;
+            border-radius: .1rem;
+            transition: width .36s;
+
+            &.active {
+                width: 1rem;
+            }
+        }
+
+    }
+}

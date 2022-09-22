@@ -1,0 +1,73 @@
+:host {
+    display: block;
+}
+
+.pager {
+    margin: 0 auto;
+
+    div {
+        padding: var(--oi-pager-page-padding, 0.375rem 0.75rem);
+        line-height: var(--oi-pager-page-line-height, 1.2);
+        text-align: center;
+        display: inline-block;
+        border: 0;
+        border-radius: 0.2rem;
+        background-color: var(--oi-pager-page-bgcolor, #fff);
+        color: var(--oi-pager-page-color, black);
+        margin-right: .3rem;
+        user-select: none;
+        font-size: 1.25rem;
+        cursor: pointer;
+        vertical-align: bottom;
+    }
+
+
+
+    .first,
+    .last,
+    .prev,
+    .next {
+        &.disable {
+            color: var(--oi-pager-disable-color, #ccc);
+            cursor: not-allowed;
+            --oi-icon-color: var(--oi-pager-disable-color, #ccc);
+        }
+        font-size:0;
+
+    }
+
+    .info {
+        width: auto;
+        cursor: auto;
+        color: var(--oi-pager-info-color, #0d6efd);
+        background-color: var(--oi-pager-info-bgcolor, transparent);
+        .curr {
+            color: var(--oi-pager-info-curr-color, red);
+        }
+    }
+
+    .jumper {
+        width: fit-content;
+        padding: 0.175rem;
+
+        .jump-to {
+            width: 3em;
+            padding: 0;
+            box-sizing: border-box;
+            height:min-content;
+        }
+        
+
+    }
+
+    .active {
+        background-color: var(--oi-pager-page-active-bgcolor, #0d6efd);
+        color: var(--oi-pager-page-active-color, #fff);
+
+    }
+
+    .page:hover {
+        background-color: var(--oi-pager-page-hover-bgcolor, #6f9ab8);
+        color: var(--oi-pager-page-hover-color, #fff);
+    }
+}

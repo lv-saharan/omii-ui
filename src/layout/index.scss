@@ -1,0 +1,86 @@
+:host {
+    display: flex;
+    flex-direction: column;
+    position: relative;
+    padding: 0;
+    margin: 0;
+    border: 0;
+    width: 100%;
+    height: 100%;
+    clear: both;
+    overflow: hidden;
+    --oi-layout-duration: .36s;
+
+    slot {
+        position: relative;
+        box-sizing: border-box;
+        display: block;
+        padding: 0;
+        margin: 0;
+        border: 0;
+
+        &[name=header] {
+            padding: val(--oi-layout-header-padding, 0);
+        }
+
+        &[name=footer] {
+            padding: val(--oi-layout-footer-padding, 0);
+        }
+
+        &[name=content] {
+            flex-grow: 1;
+            z-index: 6;
+            padding: val(--oi-layout-content-padding, 0);
+        }
+
+        &[name=left] {
+            padding: var(--oi-layout-left-padding, 0);
+
+        }
+
+        &[name=right] {
+            padding: val(--oi-layout-right-padding, 0);
+        }
+    }
+
+
+
+
+    main {
+        display: flex;
+        flex: 1 0 auto;
+        transition: all var(--oi-layout-duration) ease;
+    }
+
+
+    .collapse:not(.show, .collapse-horizontal) {
+        height: 0;
+    }
+
+    .collapse.collapse-horizontal:not(.show) {
+        width: 0;
+    }
+
+    .collapsing {
+        height: 0;
+        transition: height var(--oi-layout-duration) ease
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .collapsing {
+            transition: none
+        }
+    }
+
+    .collapsing.collapse-horizontal {
+        width: 0;
+        height: auto;
+        transition: width var(--oi-layout-duration) ease
+    }
+
+    @media (prefers-reduced-motion: reduce) {
+        .collapsing.collapse-horizontal {
+            transition: none
+        }
+    }
+}

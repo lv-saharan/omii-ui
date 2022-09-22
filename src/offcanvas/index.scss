@@ -1,0 +1,8 @@
+:host {
+    display: block;
+    width: fit-content;
+
+    slot[name=title] {
+        display: block;
+    }
+}

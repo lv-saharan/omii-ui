@@ -1,0 +1,44 @@
+.loading {
+    margin: 0 calc(2/3 * var(--oi-loading-size));
+    display: inline-block;
+    position: relative;
+    width: calc(6/30 * var(--oi-loading-size));
+    height: calc(10/30 * var(--oi-loading-size));
+    animation: rectangle infinite 1s ease-in-out -0.2s;
+    background-color: var(--oi-loading-color, #000);
+}
+
+.loading:before,
+.loading:after {
+    position: absolute;
+    width: calc(6/30 * var(--oi-loading-size));
+    height: calc(10/30 * var(--oi-loading-size));
+    content: "";
+    background-color: var(--oi-loading-color, #000);
+}
+
+.loading:before {
+    left: calc(-14/30 * var(--oi-loading-size));
+    animation: rectangle infinite 1s ease-in-out -0.4s;
+}
+
+.loading:after {
+    right: calc(-14/30 * var(--oi-loading-size));
+
+    animation: rectangle infinite 1s ease-in-out;
+}
+
+@keyframes rectangle {
+
+    0%,
+    80%,
+    100% {
+        height: calc(2/3 * var(--oi-loading-size));
+        box-shadow: 0 0 var(--oi-loading-color-a, #000);
+    }
+
+    40% {
+        height: var(--oi-loading-size);
+        box-shadow: 0 -20px var(--oi-loading-color-b, #000);
+    }
+}

@@ -1,0 +1,92 @@
+:host {
+    position: relative;
+    display: block;
+}
+
+input[type='file'] {
+    position: fixed;
+    opacity: 0;
+    width: 0;
+    height: 0;
+    left: -1000px;
+}
+
+.pictures {
+    .selector-col {
+        // .image{
+        //     position: absolute;
+
+        // }
+    }
+
+    .card {
+        width: 10rem;
+        height: 10rem;
+
+
+
+        .file {
+            --oi-icon-width: 8rem;
+            --oi-icon-height: 8rem;
+
+
+
+            label {
+                width: 100%;
+                overflow: hidden;
+                text-overflow: ellipsis;
+                white-space: nowrap;
+                word-break: break-all;
+                text-align: center;
+            }
+        }
+
+        .image {
+            width: 100%;
+            height: 100%;
+            position: absolute;
+            background-size: contain;
+            background-repeat: no-repeat;
+            background-position: center center;
+        }
+
+        .selector {
+            width: 100%;
+            height: 100%;
+            display: flex;
+            justify-content: center;
+            align-content: center;
+            align-items: center;
+            z-index: 1;
+        }
+
+        .actions {
+            --oi-icon-width: 2rem;
+            --oi-icon-height: 2rem;
+            position: absolute;
+            width: 100%;
+            height: 100%;
+            z-index: 5;
+            display: none;
+
+        }
+
+
+        &:not(.selector):hover {
+            &::after {
+                display: block;
+                content: ' ';
+                position: absolute;
+                z-index: 4;
+                width: 100%;
+                height: 100%;
+                background-color: var(--oi-secondary);
+                opacity: .9;
+            }
+
+            .actions {
+                display: block;
+            }
+        }
+    }
+}

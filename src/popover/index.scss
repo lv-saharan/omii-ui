@@ -1,0 +1,33 @@
+:host {
+    --oi-heading-color: black;
+    position: relative;
+
+    slot:not([name]) {
+        position: relative;
+        display: inline-block;
+    }
+
+    slot[name=header]:not(:empty) {
+        display: block;
+    }
+
+    slot[name=body] {
+        display: block;
+        min-width: fit-content;
+    }
+
+    .popover {
+        position: absolute;
+        width: max-content;
+        display: none;
+
+        .popover-arrow {
+            position: absolute;
+        }
+    }
+
+    .popover.show {
+        display: block;
+    }
+
+}

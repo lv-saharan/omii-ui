@@ -1,7 +1,8 @@
 {
   "name": "omii-ui",
   "version": "1.0.0",
-  "description": "",
+  "description": "omi 兼容的ui库，样式采用bootstrap。可以作为标准的esmodule使用",
+  "main": "src/index.jsx",
   "type": "module",
   "scripts": {
     "dev": "node esbuild.js dev",
@@ -24,5 +25,24 @@
     "@material-design-icons/svg": "^0.11.5",
     "bootstrap": "^5.2.0",
     "monaco-editor": "^0.34.0"
-  }
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/lv-saharan/omii-ui.git"
+  },
+  "keywords": [
+    "omii",
+    "ui",
+    "bootstrap",
+    "component",
+    "esmodule",
+    "omii-ui",
+    "omi"
+  ],
+  "author": "lv-saharan",
+  "license": "GPL-3.0",
+  "bugs": {
+    "url": "https://github.com/lv-saharan/omii-ui/issues"
+  },
+  "homepage": "https://github.com/lv-saharan/omii-ui#readme"
 }

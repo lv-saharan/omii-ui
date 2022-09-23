@@ -108,7 +108,7 @@ export default class extends uiBase {
     let {
       $activeItem,
       $items,
-      settings: { duration },
+      $props: { duration },
     } = this;
 
     let activeIndex = $items.indexOf($activeItem);

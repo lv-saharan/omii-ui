@@ -135,7 +135,11 @@ export default class extends uiBase {
   }
   render(props) {
     let nodes = props.nodes ?? this.$props.nodes;
-    let cssss = purgeCSSSS(this.$props.nodeCss, getHost(this));
+    let host = getHost(this)
+    if (typeof nodes === "function") {
+      nodes = nodes.call(host)
+    }
+    let cssss = purgeCSSSS(this.$props.nodeCss, host);
     return (
       <>
         {nodes.map((n) => (

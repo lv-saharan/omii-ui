@@ -3,7 +3,7 @@ import pkg from './package.json'  assert { type: "json" }
 import esbuild from 'esbuild'
 let [mode] = process.argv.splice(2) ?? "prod";
 //export const outputRoot = `../es-lib/omii-ui/latest`
-export const outputRoot = `./dist/omii-ui/latest`
+export const outputRoot = `./dist`
 //export const outputRoot = `../es-lib/omii-ui/${pkg.version}`
 
 

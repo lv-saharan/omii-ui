@@ -13,8 +13,7 @@ export default class extends uiBase {
     module: String,
   };
   #module;
-  load() {
-    let { src, module, loading } = this.$props;
+  load(src, module, loading = <oi-loading size="6" />) {
     this.#module = loading;
     if (src && module) {
       import(src)
@@ -34,7 +33,8 @@ export default class extends uiBase {
     }
   }
   install() {
-    this.load();
+    let { src, module, loading } = this.$props;
+    this.load(src, module, loading);
   }
   render(props) {
     return this.#module;

@@ -12,10 +12,8 @@ export default class extends uiBase {
     src: String,
     module: String,
   };
-
   #module;
-
-  #load() {
+  load() {
     let { src, module, loading } = this.$props;
     this.#module = loading;
     if (src && module) {
@@ -36,7 +34,7 @@ export default class extends uiBase {
     }
   }
   install() {
-    this.#load();
+    this.load();
   }
   render(props) {
     return this.#module;

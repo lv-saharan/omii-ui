@@ -13,7 +13,7 @@ export default class extends uiBase {
     module: String,
   };
   #module;
-  load(src, module, loading = <oi-loading size="6" />) {
+  load(src, module = "default", loading = <oi-loading size="6" />) {
     this.#module = loading;
     if (src && module) {
       import(src)

@@ -4,9 +4,9 @@ export default class OIForm extends HTMLFormElement {
   static validate(form) {
     form.noValidate = true;
     form.removeEventListener("submit", this.submitHandler);
-    form.addEventListener("submit", this.submitHandler, false);
-    form.removeEventListener("input", this.inputingHandler);
-    form.addEventListener("input", this.inputingHandler, false);
+    form.addEventListener("submit", this.submitHandler, true);
+    // form.removeEventListener("input", this.inputingHandler);
+    // form.addEventListener("input", this.inputingHandler, false);
     // form.addEventListener(
     //   "invalid",
     //   (evt) => {
@@ -39,6 +39,10 @@ export default class OIForm extends HTMLFormElement {
   }
   static submitHandler(evt) {
     const form = evt.target;
+
+    form.removeEventListener("input", this.inputingHandler);
+    form.addEventListener("input", this.inputingHandler, false);
+
     if (!form.checkValidity()) {
       evt.preventDefault();
       evt.stopPropagation();

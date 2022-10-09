@@ -14,7 +14,7 @@ export default class extends uiBase {
     module: String,
   };
   #module;
-  get module() {
+  get $module() {
     return this.#module;
   }
   load(

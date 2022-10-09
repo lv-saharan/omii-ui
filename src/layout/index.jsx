@@ -101,6 +101,12 @@ export default class extends uiBase {
   installed() {
     //installed 有时候因为样式异步会提前执行
 
+    const { openFooter, openHeader, openLeft, openRight } = this.$props;
+    if (!openFooter) this.#footerRef.current.style.height = 0;
+    if (!openHeader) this.#headerRef.current.style.height = 0;
+    if (!openLeft) this.#leftRef.current.style.height = 0;
+    if (!openRight) this.#rightRef.current.style.height = 0;
+
     this.resize();
     // setTimeout(() => {
     //     this.resize()

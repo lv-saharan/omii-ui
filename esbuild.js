@@ -2,8 +2,8 @@ import { sassPlugin } from 'esbuild-sass-plugin'
 import pkg from './package.json'  assert { type: "json" }
 import esbuild from 'esbuild'
 let [mode] = process.argv.splice(2) ?? "prod";
-export const outputRoot = `D:\\开发\\RuoYi-Vue-master\\rouyi-omii\\es-lib\\omii-ui\\latest`
-//export const outputRoot = `./dist`
+//export const outputRoot = `D:\\开发\\RuoYi-Vue-master\\rouyi-omii\\es-lib\\omii-ui\\latest`
+export const outputRoot = `./dist`
 //export const outputRoot = `../es-lib/omii-ui/${pkg.version}`
 
 

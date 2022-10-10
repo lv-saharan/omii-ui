@@ -1,56 +1,59 @@
 const { h, classNames, extractClass, createRef } = omii;
 
+function validateElement(el) {
+  const { validity } = el;
+  if (!validity.valid) {
+    const invalids = [];
+    for (let p in validity) {
+      if (p !== "valid" && validity[p] === true) {
+        invalids.push(p);
+      }
+    }
+    el.dataset.invalid = invalids.join(" ");
+    el.dataset.validationMessage = el.validationMessage;
+  } else {
+    delete el.dataset.invalid;
+    delete el.dataset.validationMessage;
+  }
+}
+function inputingHandler(evt) {
+  const form = evt.currentTarget;
+  form.checkValidity();
+  validateElement(evt.target);
+  form.classList.add("was-validated");
+}
+function validate(form) {
+  const valid = form.checkValidity();
+  Array.from(form.elements).forEach((el) => {
+    validateElement(el);
+  });
+  form.classList.add("was-validated");
+  return valid;
+}
+function submitHandler(evt) {
+  const form = evt.target;
+
+  form.removeEventListener("input", inputingHandler);
+  form.addEventListener("input", inputingHandler, false);
+
+  if (!validate(form)) {
+    evt.preventDefault();
+    evt.stopPropagation();
+  }
+}
 export default class OIForm extends HTMLFormElement {
   static validate(form) {
     form.noValidate = true;
-    form.removeEventListener("submit", this.submitHandler);
-    form.addEventListener("submit", this.submitHandler, true);
-    // form.removeEventListener("input", this.inputingHandler);
-    // form.addEventListener("input", this.inputingHandler, false);
-    // form.addEventListener(
-    //   "invalid",
-    //   (evt) => {
-    //     console.log("invalid");
-    //   },
-    //   true
-    // );
+    form.removeEventListener("submit", submitHandler);
+    form.addEventListener("submit", submitHandler, true);
   }
-  static validateElement(el) {
-    const { validity } = el;
-    if (!validity.valid) {
-      const invalids = [];
-      for (let p in validity) {
-        if (p !== "valid" && validity[p] === true) {
-          invalids.push(p);
-        }
-      }
-      el.dataset.invalid = invalids.join(" ");
-      el.dataset.validationMessage = el.validationMessage;
-    } else {
-      delete el.dataset.invalid;
-      delete el.dataset.validationMessage;
-    }
-  }
-  static inputingHandler(evt) {
-    const form = evt.currentTarget;
-    form.checkValidity();
-    OIForm.validateElement(evt.target);
-    form.classList.add("was-validated");
-  }
-  static submitHandler(evt) {
-    const form = evt.target;
 
-    form.removeEventListener("input", this.inputingHandler);
-    form.addEventListener("input", this.inputingHandler, false);
-
-    if (!form.checkValidity()) {
-      evt.preventDefault();
-      evt.stopPropagation();
-    }
-    Array.from(form.elements).forEach((el) => {
-      OIForm.validateElement(el);
-    });
-    form.classList.add("was-validated");
+  reset(){
+    super.reset()
+    this.classList.remove("was-validated")
+  }
+  validate() {
+    return validate(this);
   }
   connectedCallback() {
     this.constructor.validate(this);

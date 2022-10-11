@@ -2,6 +2,7 @@ const { define } = omii;
 
 import tab from "./tab";
 import icon from "./icon";
+import bicon from "./bootstrap/icons";
 import rate from "./rate";
 import pager from "./pager";
 import pagination from "./pagination";
@@ -32,6 +33,7 @@ import coder from "./coder";
 define("oi-rate", rate);
 define("oi-tab", tab);
 define("oi-icon", icon);
+define("oi-bi", bicon);
 define("oi-pager", pager);
 define("oi-tree", tree);
 define("oi-loading", loading);
@@ -87,7 +89,7 @@ omii.ui = {
   form,
   dropdown,
   coder,
-  importURL
+  importURL,
 };
 
 export {
@@ -96,6 +98,7 @@ export {
   css,
   effect,
   icon,
+  bicon,
   tab,
   rate,
   pager,
@@ -119,5 +122,5 @@ export {
   form,
   dropdown,
   coder,
-  importURL
+  importURL,
 };

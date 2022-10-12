@@ -7,7 +7,7 @@ export default class extends uiBase {
     src: null,
     module: "default",
     loading: <oi-loading size="6" />,
-    loadError: <h1>Load Error</h1>,
+    loadError: <h1>Module Load Error</h1>,
   };
   static propTypes = {
     src: String,
@@ -17,13 +17,12 @@ export default class extends uiBase {
   get $module() {
     return this.#module;
   }
-  load(
-    src,
-    module = "default",
-    loading = <oi-loading size="6" />,
-    loadError = <h1>Load Error</h1>
-  ) {
+  load(src, module, loading, loadError) {
+    module = module ?? this.$props.module;
+    loading = loading ?? this.$props.loading;
+    loadError = loadError ?? this.$props.loadError;
     this.#module = loading;
+
     if (src && module) {
       import(src)
         .then((modules) => {
@@ -41,6 +40,7 @@ export default class extends uiBase {
         .catch((exc) => {
           console.error("import module error！", src, module, exc);
           this.#module = loadError;
+          this.updateSelf();
         });
     }
   }

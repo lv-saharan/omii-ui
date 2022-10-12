@@ -2,6 +2,7 @@ const { h, classNames, extractClass, createRef } = omii;
 
 function validateElement(el) {
   const { validity } = el;
+  if (!validity) return;
   if (!validity.valid) {
     const invalids = [];
     for (let p in validity) {
@@ -24,11 +25,17 @@ function inputingHandler(evt) {
 }
 function validate(form) {
   const valid = form.checkValidity();
-  Array.from(form.elements).forEach((el) => {
+  const others = [...form.querySelectorAll("[data-validate")];
+
+  [...form.elements, ...others].forEach((el) => {
     validateElement(el);
   });
   form.classList.add("was-validated");
-  return valid;
+  return (
+    others.every((other) =>
+      other.checkValidity ? other.checkValidity() : true
+    ) && valid
+  );
 }
 function submitHandler(evt) {
   const form = evt.target;
@@ -48,9 +55,9 @@ export default class OIForm extends HTMLFormElement {
     form.addEventListener("submit", submitHandler, true);
   }
 
-  reset(){
-    super.reset()
-    this.classList.remove("was-validated")
+  reset() {
+    super.reset();
+    this.classList.remove("was-validated");
   }
   validate() {
     return validate(this);

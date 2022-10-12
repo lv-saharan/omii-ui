@@ -1,5 +1,5 @@
 # omii-ui
-omi 兼容的ui库，样式采用bootstrap。
+omi 兼容的ui库，样式采用bootstrap,整合bootstrap icons 和 material-design-icons
 
 # 说明
 内容整理中，

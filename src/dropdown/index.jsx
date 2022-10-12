@@ -4,9 +4,10 @@ import uiBase from "../uiBase";
 import { getCSSStyleSheets } from "../css";
 import css from "./index.scss";
 
+//当前显示的下拉关上
 let $visibleDropDown = null;
 
-document.addEventListener("click", (e) => {
+document.addEventListener("click", (evt) => {
   if ($visibleDropDown) $visibleDropDown.hide();
 });
 export default class extends uiBase {
@@ -120,7 +121,6 @@ export default class extends uiBase {
     });
 
     this.addEventListener("click", (evt) => {
-      evt.preventDefault();
       evt.stopPropagation();
     });
   }

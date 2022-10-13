@@ -19,6 +19,56 @@ omi 兼容的ui库，样式采用bootstrap,整合bootstrap icons 和 material-de
     "gen:icons": "node ./src/icon/scripts/gen-icons.js"
   },
 ```
+# Constrols
+oi-rate
+
+oi-tab
+
+oi-icon
+
+oi-bi  //bootstrap icons
+
+oi-pager 
+
+oi-tree 
+
+oi-loading 
+
+oi-alert 
+
+oi-accordion 
+
+oi-breadcrumb 
+
+oi-modal 
+
+oi-popover 
+
+oi-uploader 
+
+oi-carousel 
+
+oi-badge 
+
+oi-toast 
+
+oi-progress
+
+oi-tooltip 
+
+oi-layout 
+
+oi-import 
+
+oi-offcanvas 
+
+oi-pagination 
+
+oi-dropdown 
+
+oi-coder 
+
+oi-select 
 
 # URL
 [OMII UI ,一点示例](http://omii.flatweb.net/usage/ui "title")

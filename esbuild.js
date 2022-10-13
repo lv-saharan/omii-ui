@@ -1,9 +1,11 @@
 import { sassPlugin } from 'esbuild-sass-plugin'
 import pkg from './package.json'  assert { type: "json" }
 import esbuild from 'esbuild'
+import { dev } from "local-dev-server"
 let [mode] = process.argv.splice(2) ?? "prod";
-export const outputRoot = `D:\\开发\\RuoYi-Vue-master\\rouyi-omii\\es-lib\\omii-ui\\latest`
-//export const outputRoot = `./dist`
+
+export const outputRoot = `./dist`
+//export const outputRoot = `D:\\开发\\RuoYi-Vue-master\\rouyi-omii\\es-lib\\omii-ui\\latest`
 //export const outputRoot = `../es-lib/omii-ui/${pkg.version}`
 
 
@@ -31,11 +33,16 @@ switch (mode) {
         esbuild.build(buildOptions)
         break;
     case "dev":
+        const { reload } = dev({ ...pkg.localDev.server, openBrowser: false })
         esbuild.build({
             ...buildOptions, watch: {
                 onRebuild(error, result) {
                     if (error) console.error('watch build failed:', error)
-                    else console.log('watch build succeeded:', result)
+                    else {
+                        console.log('watch build succeeded:', result)
+                        reload("ui rebuild ok")
+                    }
+
                 },
             }
         })

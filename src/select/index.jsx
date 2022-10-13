@@ -28,17 +28,32 @@ export default class extends uiBase {
       valid,
     };
   }
+  //已经检查过有效性
+  #checked = false;
   checkValidity() {
+    this.#checked = true;
     const valid = this.validity.valid;
     if (!valid) {
       this.classList.add("is-invalid");
     } else {
       this.classList.remove("is-invalid");
     }
-    return true;
+    return valid;
+  }
+  showOptions() {
+    this.$("oi-dropdown").show();
+  }
+  receiveProps(props, old) {
+    if (props.values != old.values) {
+      this.classList.remove("is-invalid");
+    }
   }
   installed() {
     this.dataset.validate = true;
+    this.setAttribute("tabIndex", 0);
+    this.addEventListener("focus", (evt) => {
+      this.showOptions();
+    });
   }
   render() {
     let { values, options } = this.$props;
@@ -57,6 +72,7 @@ export default class extends uiBase {
           class="selected d-flex"
           onClick={(evt) => {
             evt.stopImmediatePropagation();
+            // this.showOptions();
           }}
         >
           &nbsp;
@@ -65,7 +81,11 @@ export default class extends uiBase {
               const option = options.find((option) => option.value == value);
               if (option) {
                 return (
-                  <li>
+                  <li
+                    onClick={(evt) => {
+                      evt.stopImmediatePropagation();
+                    }}
+                  >
                     {option.text}
                     <oi-bi
                       name="x"
@@ -73,7 +93,7 @@ export default class extends uiBase {
                         values.splice(index, 1);
                         this.updateSelf();
                         evt.stopPropagation();
-                        this.checkValidity();
+                        if (this.#checked) this.checkValidity();
                       }}
                     />
                   </li>
@@ -84,7 +104,7 @@ export default class extends uiBase {
           <div
             class="expander"
             onClick={(evt) => {
-              this.$("oi-dropdown").show();
+              this.showOptions();
             }}
           ></div>
         </div>
@@ -110,7 +130,7 @@ export default class extends uiBase {
                       }
                     }
                     this.updateSelf();
-                    this.checkValidity();
+                    if (this.#checked) this.checkValidity();
                   }}
                 />
                 <label

@@ -170,7 +170,7 @@ export default class extends uiBase {
 
   get pageCount() {
     let { total, pageSize, pageCount } = this.$props;
-    if (total && pageSize) {
+    if ((total || total === 0) && pageSize) {
       return Math.ceil(total / pageSize);
     }
     return pageCount;

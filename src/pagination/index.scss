@@ -8,11 +8,17 @@
 }
 
 .jumper {
-    margin: 0 .5rem;
-
     .page-link {
-        padding: 0;
         border-color: transparent;
 
     }
+}
+.jump-to{
+    margin:0;
+    padding:0;
+    border: 0;
+    outline:var(--oi-gray-dark) solid 1px
+}
+.pagination{
+    margin: 0;
 }

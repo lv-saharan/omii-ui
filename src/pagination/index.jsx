@@ -24,7 +24,7 @@ export default class extends Pager {
               evt.stopPropagation();
             }}
           >
-            <span aria-hidden="true">&lt;</span>
+            <span aria-hidden="true">&lsaquo;</span>
           </a>
         </li>
       );
@@ -45,7 +45,7 @@ export default class extends Pager {
               evt.stopPropagation();
             }}
           >
-            <span aria-hidden="true">&gt;</span>
+            <span aria-hidden="true">&rsaquo;</span>
           </a>
         </li>
       );
@@ -141,7 +141,7 @@ export default class extends Pager {
     },
     createJumper(settings, pager) {
       return (
-        <li class="jumper page-item">
+        <li class="jumper page-item mx-2">
           <span className="page-link">
             前往
             <input

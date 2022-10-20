@@ -13,9 +13,81 @@ export default class extends uiBase {
     values: [],
     multiple: true,
     required: false,
+    preserveOrder: true, //保留顺序
+    createOption(option, index) {
+      const { values, multiple } = this.$props;
+      const labelProps = {};
+      if (multiple) {
+        labelProps.for = `option${index}`;
+      } else {
+        //single select
+        labelProps.onClick = (evt) => {
+          //toggle option
+          if (values.includes(option.value)) {
+            values.splice(0, values.length);
+          } else {
+            values.push(option.value);
+          }
+        };
+      }
+      return (
+        <div class="form-check d-flex">
+          {multiple && (
+            <input
+              class="form-check-input"
+              type="checkbox"
+              value={option.value}
+              id={`option${index}`}
+              checked={values.includes(option.value)}
+              onChange={(evt) => {
+                if (evt.target.checked) {
+                  if (!values.includes(option.value)) {
+                    values.push(option.value);
+                  }
+                } else {
+                  const findIndex = values.indexOf(option.value);
+                  if (findIndex != -1) {
+                    values.splice(findIndex, 1);
+                  }
+                }
+                this.updateSelf();
+                if (this.#checked) this.checkValidity();
+              }}
+            />
+          )}
+
+          <label class="form-check-label flex-grow-1" {...labelProps}>
+            {option.text}
+          </label>
+        </div>
+      );
+    },
+    createSelected(option, index) {
+      const { values } = this.$props;
+
+      return (
+        <li
+          onClick={(evt) => {
+            evt.stopImmediatePropagation();
+          }}
+        >
+          {option.text}
+          <oi-bi
+            name="x"
+            onClick={(evt) => {
+              values.splice(index, 1);
+              this.updateSelf();
+              evt.stopPropagation();
+              if (this.#checked) this.checkValidity();
+            }}
+          />
+        </li>
+      );
+    },
   };
   static propTypes = {
     multiple: Boolean,
+    preserveOrder: Boolean,
     required: Boolean,
   };
   get validity() {
@@ -56,8 +128,19 @@ export default class extends uiBase {
     });
   }
   render() {
-    let { values, options } = this.$props;
+    let { values, options, preserveOrder, createSelected, createOption } =
+      this.$props;
+    createOption = createOption.bind(this);
+    createSelected = createSelected.bind(this);
     values = values ?? [];
+    if (preserveOrder) {
+      values.sort(
+        (x, y) =>
+          options.findIndex((option) => option.value == x) -
+          options.findIndex((option) => option.value == y)
+      );
+    }
+
     options = options ?? [];
     return (
       <oi-dropdown
@@ -80,24 +163,7 @@ export default class extends uiBase {
             {values.map((value, index) => {
               const option = options.find((option) => option.value == value);
               if (option) {
-                return (
-                  <li
-                    onClick={(evt) => {
-                      evt.stopImmediatePropagation();
-                    }}
-                  >
-                    {option.text}
-                    <oi-bi
-                      name="x"
-                      onClick={(evt) => {
-                        values.splice(index, 1);
-                        this.updateSelf();
-                        evt.stopPropagation();
-                        if (this.#checked) this.checkValidity();
-                      }}
-                    />
-                  </li>
-                );
+                return createSelected(option, index);
               }
             })}
           </ul>
@@ -110,37 +176,7 @@ export default class extends uiBase {
         </div>
         <ul class="dropdown-menu" slot="menu">
           {options.map((option, index) => (
-            <li>
-              <div class="form-check d-flex">
-                <input
-                  class="form-check-input"
-                  type="checkbox"
-                  value={option.value}
-                  id={`option${index}`}
-                  checked={values.includes(option.value)}
-                  onChange={(evt) => {
-                    if (evt.target.checked) {
-                      if (!values.includes(option.value)) {
-                        values.push(option.value);
-                      }
-                    } else {
-                      const findIndex = values.indexOf(option.value);
-                      if (findIndex != -1) {
-                        values.splice(findIndex, 1);
-                      }
-                    }
-                    this.updateSelf();
-                    if (this.#checked) this.checkValidity();
-                  }}
-                />
-                <label
-                  class="form-check-label flex-grow-1"
-                  for={`option${index}`}
-                >
-                  {option.text}
-                </label>
-              </div>
-            </li>
+            <li>{createOption(option, index)}</li>
           ))}
         </ul>
       </oi-dropdown>

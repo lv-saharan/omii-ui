@@ -30,6 +30,7 @@ import vision from "./vision";
 import dropdown from "./dropdown";
 import coder from "./coder";
 import select from "./select";
+import table from "./table";
 define("oi-rate", rate);
 define("oi-tab", tab);
 define("oi-icon", icon);
@@ -55,6 +56,7 @@ define("oi-pagination", pagination);
 define("oi-dropdown", dropdown);
 define("oi-coder", coder);
 define("oi-select", select);
+define("oi-table", table);
 
 // define("oi-form", form);
 customElements.define("oi-form", form, { extends: "form" });
@@ -91,6 +93,8 @@ omii.ui = {
   form,
   dropdown,
   coder,
+  select,
+  table,
   importURL,
 };
 
@@ -124,5 +128,7 @@ export {
   form,
   dropdown,
   coder,
+  select,
+  table,
   importURL,
 };

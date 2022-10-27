@@ -1,6 +1,7 @@
 import uiBase from "../uiBase";
 import css from "./index.scss";
 import treeNode from "./node";
+import sortable from "../sortable";
 const { h, purgeCSSSS, getHost } = omii;
 
 export { treeNode };
@@ -13,6 +14,7 @@ export default class extends uiBase {
     checkboxTree: false,
     multiSelect: false, //可單選的樹 | true 多選
     sortable: false,
+    sortGroup: null,
     ignoreAttrs: true,
     selectedKey: null, //選中的行
     selectedKeys: [],
@@ -32,6 +34,9 @@ export default class extends uiBase {
     radioedKey: String,
     nodes: Array,
   };
+  get sortGroup() {
+    return this.$props.sortGroup ?? `sort-${this.elementId}`;
+  }
   get selectedKeys() {
     return this.$props.selectedKeys;
   }
@@ -133,19 +138,55 @@ export default class extends uiBase {
     if (index != -1) expandedKeys.splice(index, 1);
     if (update) this.update();
   }
-  render(props) {
-    let nodes = props.nodes ?? this.$props.nodes;
-    let host = getHost(this)
-    if (typeof nodes === "function") {
-      nodes = nodes.call(host)
+  async installed() {
+    if (this.$props.sortable) {
+      const Sortable = await sortable.use();
+      Sortable.create(this.$(".tree-container"), {
+        delay: 100,
+        group: this.sortGroup,
+        onAdd: (evt) => {
+          const toHost = getHost(evt.to);
+          evt.item.update$Props({ nodeLevel: 0 }, true, true);
+          toHost.updateSelf();
+        },
+        onEnd: (evt) => {
+          const fromHost = getHost(evt.from);
+          const toHost = getHost(evt.to);
+          const fromNodes =
+            fromHost == this ? fromHost.nodes : fromHost.children;
+          const toNodes = toHost == this ? toHost.nodes : toHost.children;
+
+          this.fire("sorted", {
+            fromNodes,
+            toNodes,
+            fromIndex: evt.oldIndex,
+            toIndex: evt.newIndex,
+          });
+        },
+      });
     }
+  }
+  #nodes;
+  get nodes() {
+    if (!this.#nodes) {
+      let nodes = this.$props.nodes;
+      let host = getHost(this);
+      if (typeof nodes === "function") {
+        nodes = nodes.call(host);
+      }
+      this.#nodes = nodes;
+    }
+    return this.#nodes;
+  }
+  render() {
+    let host = getHost(this);
     let cssss = purgeCSSSS(this.$props.nodeCss, host);
     return (
-      <>
-        {nodes.map((n) => (
+      <div className="tree-container">
+        {this.nodes.map((n) => (
           <oi-tree-node node={n} tree={this} cssss={cssss} />
         ))}
-      </>
+      </div>
     );
   }
 }

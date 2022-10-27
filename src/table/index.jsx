@@ -7,7 +7,7 @@ export default class extends uiBase {
   static css = [() => getCSSStyleSheets("reboot", "utilities", "tables"), css];
 
   static defaultProps = {
-    rows: null,
+    rows: [],
     /**
      * {title,field，type,style,titleStyle,sort}
      * type:normal,checkbox,radio,index,

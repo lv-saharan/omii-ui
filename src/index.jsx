@@ -1,4 +1,6 @@
 const { define } = omii;
+import utils from "./utils";
+import sortable from "./sortable";
 
 import tab from "./tab";
 import icon from "./icon";
@@ -25,12 +27,11 @@ import layout from "./layout";
 import _import from "./import";
 import offcanvas from "./offcanvas";
 import form from "./form";
-import utils from "./utils";
-import vision from "./vision";
 import dropdown from "./dropdown";
 import coder from "./coder";
 import select from "./select";
 import table from "./table";
+
 define("oi-rate", rate);
 define("oi-tab", tab);
 define("oi-icon", icon);
@@ -65,7 +66,6 @@ const importURL = import.meta.url;
 
 omii.ui = {
   utils,
-  vision,
   css,
   effect,
   icon,
@@ -96,11 +96,11 @@ omii.ui = {
   select,
   table,
   importURL,
+  sortable,
 };
 
 export {
   utils,
-  vision,
   css,
   effect,
   icon,
@@ -131,4 +131,5 @@ export {
   select,
   table,
   importURL,
+  sortable,
 };

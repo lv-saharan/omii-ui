@@ -10,8 +10,9 @@ function validateElement(el) {
         invalids.push(p);
       }
     }
-    el.dataset.invalid = invalids.join(" ");
-    el.dataset.validationMessage = el.validationMessage;
+    if (invalids.length) el.dataset.invalid = invalids.join(" ");
+    if (el.validationMessage)
+      el.dataset.validationMessage = el.validationMessage;
   } else {
     delete el.dataset.invalid;
     delete el.dataset.validationMessage;

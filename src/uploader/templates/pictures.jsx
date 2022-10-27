@@ -1,5 +1,5 @@
 const { h, classNames } = omii;
-import { getPreviewUrl } from "../../vision";
+import { creatPreviewUrl } from "preview-utils";
 import { getFileType } from "../../utils";
 
 const isImage = (file) => {
@@ -8,7 +8,7 @@ const isImage = (file) => {
 
 const createCard = (file) => {
   if (isImage(file)) {
-    file.url = file.url ?? getPreviewUrl(file.file);
+    file.url = file.url ?? creatPreviewUrl(file.file);
     return (
       <div
         title={file.name}

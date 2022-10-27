@@ -28,9 +28,16 @@ let buildOptions = {
         type: "css-text"
     })],
 }
+//minify sortablejs
+esbuild.build({
+    ...buildOptions,
+    entryPoints: ['node_modules/sortablejs/modular/sortable.core.esm.js'],
+    outfile: `${outputRoot}/sortablejs/sortable.core.esm.js`
+})
 switch (mode) {
     case "prod":
         esbuild.build(buildOptions)
+
         break;
     case "dev":
         const { reload } = dev({ ...pkg.localDev.server, openBrowser: false })
@@ -48,3 +55,5 @@ switch (mode) {
         })
         break;
 }
+
+

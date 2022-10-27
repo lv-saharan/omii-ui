@@ -13,6 +13,10 @@ export default class extends uiBase {
     values: [],
     multiple: true,
     required: false,
+    //最少
+    min: 0,
+    //最多
+    max: 0,
     preserveOrder: true, //保留顺序
     createOption(option, index) {
       const { values, multiple } = this.$props;
@@ -89,16 +93,29 @@ export default class extends uiBase {
     multiple: Boolean,
     preserveOrder: Boolean,
     required: Boolean,
+    min: Number,
+    max: Number,
   };
   get validity() {
-    const { required, values } = this.$props;
-    let valid = true;
-    if (required && (!values || values.length == 0)) {
-      valid = false;
-    }
-    return {
-      valid,
+    const { required, values, min, max } = this.$props;
+    const result = {
+      valid: true,
     };
+    if (required && (!values || values.length == 0)) {
+      result.valid = false;
+      result.valueMissing = true;
+    }
+    if (result.valid) {
+      if (min != 0 && min > values.length) {
+        result.valid = false;
+        result.rangeUnderflow = true;
+      }
+      if (max != 0 && max < values.length) {
+        result.valid = false;
+        result.rangeOverflow = true;
+      }
+    }
+    return result;
   }
   //已经检查过有效性
   #checked = false;

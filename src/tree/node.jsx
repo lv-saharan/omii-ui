@@ -58,9 +58,17 @@ class TreeNode extends uiBase {
   get node() {
     return this.$props.node ?? {};
   }
-  #children;
-  get children() {
-    return this.#children;
+  //children nodes
+  #nodes;
+  /**
+   * children nodes
+   * 排序时用来确定数组范围
+   */
+  get nodes() {
+    return this.#nodes;
+  }
+  get noChildren() {
+    return !this.nodes || this.nodes.length == 0;
   }
   get path() {
     const pnode = this.parentTreeNode;
@@ -79,7 +87,7 @@ class TreeNode extends uiBase {
   get level() {
     return this.$props.nodeLevel ?? 0;
   }
-  #isloading = false;
+  // #isloading = false;
   expand() {
     this.tree.expand(this.key, false);
     this.node.expanded = true;
@@ -130,9 +138,7 @@ class TreeNode extends uiBase {
     this.tree.unradio(this.key, false);
     this.tree.fire("nodeUnRadio", { node: this.node, treeNode: this });
   }
-  get noChildren() {
-    return !this.node.children;
-  }
+
   toggle() {
     if (this.expanded) this.collapse();
     else this.expand();
@@ -189,32 +195,36 @@ class TreeNode extends uiBase {
       this.tree.__selectedNode = this;
     }
   }
+  #Sortable;
+  get Sortable() {
+    return this.#Sortable;
+  }
   async installed() {
     if (this.sortable) {
       const Sortable = await sortable.use();
-      Sortable.create(this.$(".children"), {
+      this.#Sortable = Sortable.create(this.$(".children"), {
         delay: 100,
+        handle: ".element",
+        swapThreshold: 0.65,
+        fallbackOnBody: true,
         group: this.tree.sortGroup,
-        onAdd: (evt) => {
-          const toHost = getHost(evt.to);
-          evt.item.update$Props(
-            {
-              nodeLevel: toHost.level + 1,
-            },
-            true,
-            true
-          );
-          toHost.updateSelf();
-        },
+
+        // onAdd: (evt) => {
+        //   // const toHost = getHost(evt.to);
+        //   // evt.item.update$Props(
+        //   //   {
+        //   //     nodeLevel: toHost.level + 1,
+        //   //   },
+        //   //   true,
+        //   //   true
+        //   // );
+        //   //toHost.updateSelf();
+        // },
         onEnd: (evt) => {
           const fromHost = getHost(evt.from);
           const toHost = getHost(evt.to);
-          const fromNodes =
-            fromHost.tagName == "OI-TREE-NODE"
-              ? fromHost.children
-              : fromHost.nodes;
-          const toNodes =
-            toHost.tagName == "OI-TREE-NODE" ? toHost.children : toHost.nodes;
+          const fromNodes = fromHost.nodes;
+          const toNodes = toHost.nodes;
 
           this.tree.fire("sorted", {
             fromNodes,
@@ -233,16 +243,21 @@ class TreeNode extends uiBase {
       $element = await $element(node, props, this);
     }
     let $children = null;
-    let children = (this.#children = node.children);
+    let children = (this.#nodes = node.children);
     if (typeof children === "function") {
       if (this.expanded) {
-        this.#children = children = await children(node, props, this);
+        this.#nodes = children = await children(node, props, this);
       }
     }
 
-    //每次都会创建
     $children = (
-      <div class={classNames("children", { expanded: this.expanded })}>
+      <div
+        class={classNames("children", {
+          expanded: this.expanded,
+          sortable: this.sortable,
+          empty: this.noChildren,
+        })}
+      >
         {this.expanded &&
           (children instanceof Array
             ? children.map((child) => (
@@ -256,26 +271,12 @@ class TreeNode extends uiBase {
             : children)}
       </div>
     );
-    // if (children && this.expanded)
-    //   $children = (
-    //     <div class={classNames("children", { expanded: this.expanded })}>
-    //       {children instanceof Array
-    //         ? children.map((child) => (
-    //             <oi-tree-node
-    //               node={child}
-    //               node-level={this.level + 1}
-    //               tree={this.tree}
-    //               cssss={cssss}
-    //             />
-    //           ))
-    //         : children}
-    //     </div>
-    //   );
+
     return (
       <div
         class={classNames("node", {
           expanded: this.expanded,
-          "loading-children": this.#isloading,
+          // "loading-children": this.#isloading,
           "no-children": this.noChildren,
         })}
       >
@@ -299,7 +300,7 @@ class TreeNode extends uiBase {
           {this.$checkbox}
           {this.$radio}
           <div class="text">{$element}</div>
-          {this.#isloading ? <oi-loading /> : null}
+          {/* {this.#isloading ? <oi-loading /> : null} */}
         </div>
         {$children}
       </div>

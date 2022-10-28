@@ -2,7 +2,7 @@ import uiBase from "../uiBase";
 import css from "./index.scss";
 import treeNode from "./node";
 import sortable from "../sortable";
-const { h, purgeCSSSS, getHost } = omii;
+const { h, purgeCSSSS, getHost,classNames } = omii;
 
 export { treeNode };
 
@@ -55,6 +55,10 @@ export default class extends uiBase {
     return this.$props.radioedKey;
   }
 
+  #Sortable;
+  get Sortable() {
+    return this.#Sortable;
+  }
   isSelected(key) {
     let { multiSelect, selectedKey, selectedKeys } = this.$props;
     if (!multiSelect) return selectedKey != null && selectedKey == key;
@@ -141,20 +145,21 @@ export default class extends uiBase {
   async installed() {
     if (this.$props.sortable) {
       const Sortable = await sortable.use();
-      Sortable.create(this.$(".tree-container"), {
+      this.#Sortable = Sortable.create(this.rootNode, {
         delay: 100,
+        swapThreshold: 0.65,
+
         group: this.sortGroup,
-        onAdd: (evt) => {
-          const toHost = getHost(evt.to);
-          evt.item.update$Props({ nodeLevel: 0 }, true, true);
-          toHost.updateSelf();
-        },
+        // onAdd: (evt) => {
+        //   // const toHost = getHost(evt.to);
+        //   // evt.item.update$Props({ nodeLevel: 0 }, true, true);
+        //   //toHost.updateSelf();
+        // },
         onEnd: (evt) => {
           const fromHost = getHost(evt.from);
           const toHost = getHost(evt.to);
-          const fromNodes =
-            fromHost == this ? fromHost.nodes : fromHost.children;
-          const toNodes = toHost == this ? toHost.nodes : toHost.children;
+          const fromNodes = fromHost.nodes;
+          const toNodes = toHost.nodes;
 
           this.fire("sorted", {
             fromNodes,
@@ -182,7 +187,11 @@ export default class extends uiBase {
     let host = getHost(this);
     let cssss = purgeCSSSS(this.$props.nodeCss, host);
     return (
-      <div className="tree-container">
+      <div
+        class={classNames("tree-container", {
+          sortable: this.sortable,
+        })}
+      >
         {this.nodes.map((n) => (
           <oi-tree-node node={n} tree={this} cssss={cssss} />
         ))}

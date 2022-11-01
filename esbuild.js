@@ -3,7 +3,7 @@ import pkg from './package.json'  assert { type: "json" }
 import esbuild from 'esbuild'
 import { dev } from "local-dev-server"
 import fs from "fs"
-
+import path from "path"
 let [mode] = process.argv.splice(2) ?? "prod";
 
 export const outputRoot = `./dist`
@@ -43,6 +43,9 @@ const editorOptions = [
         outfile: `${outputRoot}/editor/engines/tinymce.js`
     }
 ]
+
+fs.cpSync('node_modules/tinymce', path.join('./dist', "tinymce"), { recursive: true })
+
 switch (mode) {
     case "prod":
         esbuild.build(buildOptions)

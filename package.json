@@ -37,7 +37,8 @@
     "local-dev-server": "^1.0.10",
     "monaco-editor": "^0.34.0",
     "preview-utils": "^1.0.1",
-    "sortablejs": "^1.15.0"
+    "sortablejs": "^1.15.0",
+    "tinymce": "^6.2.0"
   },
   "repository": {
     "type": "git",

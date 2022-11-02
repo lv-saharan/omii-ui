@@ -39,10 +39,14 @@ export default class extends uiBase {
       new URL(this.constructor.jsFile, this.constructor.root).href
     );
     this.#echart = echarts.init(this.$("main"));
+    this.draw();
+  }
+
+  draw() {
     this.echart.setOption(this.$props);
   }
-  receiveProps() {
-    this.echart.setOption(this.$props);
+  updated() {
+    this.draw();
   }
   render() {
     return <main />;

@@ -1,7 +1,0 @@
-{
-  "version": 3,
-  "sources": ["../../../src/editor/engines/tinymce.js"],
-  "sourcesContent": ["const baseUrl = new URL('../../tinymce/', import.meta.url).href\r\nexport async function setup() {\r\n    return await import(baseUrl + \"tinymce.js\")\r\n}\r\nexport async function create(el, options, host) {\r\n    await setup()\r\n    const target = document.createElement(\"textarea\")\r\n    el.appendChild(target)\r\n    target.value = host.value\r\n    target.placeholder = options.placeholder\r\n    tinymce.init({\r\n        target,\r\n        base_url: baseUrl,\r\n        setup: (editor) => {\r\n            editor.on('change', (e) => {\r\n                host.value = editor.getContent()\r\n                host.fire(\"change\", { value: host.value })\r\n            });\r\n        }\r\n    })\r\n}\r\n\r\n"],
-  "mappings": "AAAA,GAAM,GAAU,GAAI,KAAI,iBAAkB,YAAY,GAAG,EAAE,KAC3D,kBAA8B,CAC1B,MAAO,MAAM,QAAO,EAAU,aAClC,CACA,iBAA6B,EAAI,EAAS,EAAM,CAC5C,KAAM,GAAM,EACZ,GAAM,GAAS,SAAS,cAAc,UAAU,EAChD,EAAG,YAAY,CAAM,EACrB,EAAO,MAAQ,EAAK,MACpB,EAAO,YAAc,EAAQ,YAC7B,QAAQ,KAAK,CACT,SACA,SAAU,EACV,MAAO,AAAC,GAAW,CACf,EAAO,GAAG,SAAU,AAAC,GAAM,CACvB,EAAK,MAAQ,EAAO,WAAW,EAC/B,EAAK,KAAK,SAAU,CAAE,MAAO,EAAK,KAAM,CAAC,CAC7C,CAAC,CACL,CACJ,CAAC,CACL",
-  "names": []
-}

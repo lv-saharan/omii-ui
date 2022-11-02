@@ -70,6 +70,13 @@ oi-coder
 
 oi-select 
 
+oi-table 
+
+oi-tinymce
+
+oi-echart 
+
+
 # URL
 [OMII UI ,一点示例](http://omii.flatweb.net/usage/ui "title")
 

@@ -31,7 +31,9 @@ import dropdown from "./dropdown";
 import coder from "./coder";
 import select from "./select";
 import table from "./table";
-import editor from "./editor";
+import tinymce from "./tinymce";
+import echarts from "./echarts";
+
 define("oi-rate", rate);
 define("oi-tab", tab);
 define("oi-icon", icon);
@@ -58,7 +60,8 @@ define("oi-dropdown", dropdown);
 define("oi-coder", coder);
 define("oi-select", select);
 define("oi-table", table);
-define("oi-editor", editor);
+define("oi-tinymce", tinymce);
+define("oi-echarts", echarts);
 
 // define("oi-form", form);
 customElements.define("oi-form", form, { extends: "form" });
@@ -98,7 +101,8 @@ omii.ui = {
   table,
   importURL,
   sortable,
-  editor,
+  tinymce,
+  echarts,
 };
 
 export {
@@ -134,5 +138,6 @@ export {
   table,
   importURL,
   sortable,
-  editor,
+  tinymce,
+  echarts,
 };

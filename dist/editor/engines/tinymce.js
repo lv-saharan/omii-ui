@@ -1,2 +1,2 @@
-var n=new URL("../../tinymce/",import.meta.url).href;async function i(){return await import(n+"tinymce.js")}async function u(a,r,e){await i(),tinymce.init({target:a,base_url:n,setup:t=>{t.on("change",c=>{e.value=t.getContent(),e.fire("change",{value:e.value})})}})}export{u as create,i as setup};
+var n=new URL("../../tinymce/",import.meta.url).href;async function l(){return await import(n+"tinymce.js")}async function i(c,r,e){await l();let t=document.createElement("textarea");c.appendChild(t),t.value=e.value,t.placeholder=r.placeholder,tinymce.init({target:t,base_url:n,setup:a=>{a.on("change",u=>{e.value=a.getContent(),e.fire("change",{value:e.value})})}})}export{i as create,l as setup};
 //# sourceMappingURL=tinymce.js.map

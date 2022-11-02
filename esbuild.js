@@ -37,15 +37,12 @@ esbuild.build({
     outfile: `${outputRoot}/sortablejs/sortable.core.esm.js`
 })
 
-const editorOptions = [
-    {
-        entryPoints: ['./src/editor/engines/tinymce.js'],
-        outfile: `${outputRoot}/editor/engines/tinymce.js`
-    }
-]
+//tinymce copy
 
 fs.cpSync('node_modules/tinymce', path.join('./dist', "tinymce"), { recursive: true })
 
+//echarts copy 
+fs.cpSync("node_modules/echarts/dist", path.join('./dist', "echarts"), { recursive: true })
 switch (mode) {
     case "prod":
         esbuild.build(buildOptions)
@@ -75,13 +72,13 @@ switch (mode) {
             ...devOptions
         })
 
-        for (let editorOption of editorOptions) {
-            esbuild.build({
-                ...buildOptions,
-                ...editorOption,
-                ...devOptions
-            })
-        }
+        // for (let editorOption of editorOptions) {
+        //     esbuild.build({
+        //         ...buildOptions,
+        //         ...editorOption,
+        //         ...devOptions
+        //     })
+        // }
         break;
 }
 

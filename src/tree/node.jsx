@@ -2,7 +2,7 @@ import uiBase from "../uiBase";
 import css from "./node.scss";
 import sortable from "../sortable";
 
-const { h, classNames, define, getHost } = omii;
+const { h, classNames, define, getHost, throttle } = omii;
 /**
  * node {
  * key,
@@ -203,10 +203,11 @@ class TreeNode extends uiBase {
     if (this.sortable) {
       const Sortable = await sortable.use();
       this.#Sortable = Sortable.create(this.$(".children"), {
-        delay: 100,
+        delay: 150,
         handle: ".element",
-        swapThreshold: 0.65,
+        // swapThreshold: 0.65,
         fallbackOnBody: true,
+        invertSwap: true,
         group: this.tree.sortGroup,
 
         // onAdd: (evt) => {
@@ -224,16 +225,37 @@ class TreeNode extends uiBase {
           const fromHost = getHost(evt.from);
           const toHost = getHost(evt.to);
           const fromNodes = fromHost.nodes;
-          const toNodes = toHost.nodes;
+          let toNodes = toHost.nodes;
+          if (!toNodes) {
+            toNodes = [];
+            toHost.node.children = toNodes;
+          }
 
           this.tree.fire("sorted", {
+            fromNode: fromHost.node,
             fromNodes,
+            toNode: toHost.node,
             toNodes,
             fromIndex: evt.oldIndex,
             toIndex: evt.newIndex,
           });
         },
       });
+
+      // const $node = this.$(".node");
+      // $node.addEventListener(
+      //   "dragover",
+      //   throttle(
+      //     2000,
+      //     (evt) => {
+      //       $node.classList.add("hover");
+      //     },
+      //     { noLeading: true }
+      //   )
+      // );
+      // $node.addEventListener("dragleave", (evt) => {
+      //   $node.classList.remove("hover");
+      // });
     }
   }
   async render(props) {
@@ -299,7 +321,7 @@ class TreeNode extends uiBase {
           ></div>
           {this.$checkbox}
           {this.$radio}
-          <div class="text">{$element}</div>
+          <div class="label">{$element}</div>
           {/* {this.#isloading ? <oi-loading /> : null} */}
         </div>
         {$children}

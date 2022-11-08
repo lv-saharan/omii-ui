@@ -32,16 +32,14 @@ export default class extends uiBase {
           {
             activeKey: key,
           },
-          true,
-          true
+          { ignoreAttrs: true, updateSelf: true }
         );
       } else {
         this.update$Props(
           {
             activeIndex: index,
           },
-          true,
-          true
+          { ignoreAttrs: true, updateSelf: true }
         );
       }
     }

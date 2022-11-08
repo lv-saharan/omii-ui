@@ -145,12 +145,18 @@ export default class extends uiBase {
     });
   }
   render() {
-    let { values, options, preserveOrder, createSelected, createOption } =
-      this.$props;
+    let {
+      values,
+      options,
+      preserveOrder,
+      createSelected,
+      createOption,
+      multiple,
+    } = this.$props;
     createOption = createOption.bind(this);
     createSelected = createSelected.bind(this);
     values = values ?? [];
-    if (preserveOrder) {
+    if (preserveOrder && multiple) {
       values.sort(
         (x, y) =>
           options.findIndex((option) => option.value == x) -

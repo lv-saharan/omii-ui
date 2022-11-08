@@ -44,6 +44,9 @@ export default class extends uiBase {
 
   set value(value) {
     this.$props.value = value;
+    if (this.editor) {
+      this.editor.setContent(value);
+    }
     this.fire("change", { value });
   }
 
@@ -82,12 +85,14 @@ export default class extends uiBase {
   }
 
   async installed() {
+    console.log("tiny installed")
     await import(new URL(this.constructor.jsFile, this.constructor.root).href);
     const $editor = this.$("#editor");
-    this.#editor = tinymce.init({
+    tinymce.init({
       target: $editor,
       base_url: this.constructor.root,
       setup: (editor) => {
+        this.#editor = editor;
         editor.on("change", (e) => {
           this.value = editor.getContent();
           this.fire("change", { value: this.value });

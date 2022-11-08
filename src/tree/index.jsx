@@ -2,7 +2,7 @@ import uiBase from "../uiBase";
 import css from "./index.scss";
 import treeNode from "./node";
 import sortable from "../sortable";
-const { h, purgeCSSSS, getHost,classNames } = omii;
+const { h, purgeCSSSS, getHost, classNames } = omii;
 
 export { treeNode };
 
@@ -146,15 +146,16 @@ export default class extends uiBase {
     if (this.$props.sortable) {
       const Sortable = await sortable.use();
       this.#Sortable = Sortable.create(this.rootNode, {
-        delay: 100,
-        swapThreshold: 0.65,
-
+        delay: 150,
+        fallbackOnBody: true,
+        invertSwap: true,
         group: this.sortGroup,
         // onAdd: (evt) => {
         //   // const toHost = getHost(evt.to);
         //   // evt.item.update$Props({ nodeLevel: 0 }, true, true);
         //   //toHost.updateSelf();
         // },
+
         onEnd: (evt) => {
           const fromHost = getHost(evt.from);
           const toHost = getHost(evt.to);
@@ -162,7 +163,9 @@ export default class extends uiBase {
           const toNodes = toHost.nodes;
 
           this.fire("sorted", {
+            fromNode: fromHost.node,
             fromNodes,
+            toNode: toHost.node,
             toNodes,
             fromIndex: evt.oldIndex,
             toIndex: evt.newIndex,

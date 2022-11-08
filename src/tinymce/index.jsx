@@ -47,7 +47,9 @@ export default class extends uiBase {
     if (this.editor) {
       this.editor.setContent(value);
     }
-    this.fire("change", { value });
+    //这里不能fire change，这样容易引起循环调用
+    //监控change的控件可能会继续调用update
+    //this.fire("change", { value });
   }
 
   #editor;

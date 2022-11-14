@@ -46,12 +46,12 @@ fs.cpSync("node_modules/echarts/dist", path.join('./dist', "echarts"), { recursi
 switch (mode) {
     case "prod":
         esbuild.build(buildOptions)
-        for (let editorOption of editorOptions) {
-            esbuild.build({
-                ...buildOptions,
-                ...editorOption
-            })
-        }
+        // for (let editorOption of editorOptions) {
+        //     esbuild.build({
+        //         ...buildOptions,
+        //         ...editorOption
+        //     })
+        // }
         break;
     case "dev":
         const { reload } = dev({ ...pkg.localDev.server, openBrowser: false })

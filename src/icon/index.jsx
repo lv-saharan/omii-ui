@@ -60,6 +60,9 @@ export default class extends uiBase {
       vertical-align:var(--oi-icon-valign,middle) ;
       
     }
+    :host svg{
+      vertical-align:sub ;
+    }
   `;
 
   static useBundleMode() {

@@ -69,6 +69,9 @@ var ni=Object.defineProperty;var li=Object.getPrototypeOf;var ci=Reflect.get;var
       vertical-align:var(--oi-icon-valign,middle) ;
       
     }
+    :host svg{
+      vertical-align:sub ;
+    }
   `);var{h:Ko}=omii,vo=async t=>{try{let{default:e}=await import(`./bootstrap/icons/${t}.js`);return e}catch{console.error("load icon error",t,type)}},Bi=async(t,e={})=>{let o=await vo(t);return Ko("svg",{xmlns:"http://www.w3.org/2000/svg",viewBox:"0 0 24 24",part:"svg",...e},o)},X=class extends f{css(){let{size:t,color:e}=this.$props,o=e||"var(--oi-bi-color)",s=t?`${t}rem`:"var(--oi-bi-width, 1rem)",i=t?`${t}rem`:"var(--oi-bi-height, 1rem);";return`
       :host svg{
         fill: ${o} ;

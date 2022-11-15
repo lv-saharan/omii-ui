@@ -40,9 +40,11 @@ esbuild.build({
 //tinymce copy
 
 fs.cpSync('node_modules/tinymce', path.join('./dist', "tinymce"), { recursive: true })
+fs.cpSync('src/tinymce/langs', path.join('./dist', "tinymce/langs"), { recursive: true })
 
 //echarts copy 
 fs.cpSync("node_modules/echarts/dist", path.join('./dist', "echarts"), { recursive: true })
+
 switch (mode) {
     case "prod":
         esbuild.build(buildOptions)

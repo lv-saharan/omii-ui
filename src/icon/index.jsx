@@ -58,10 +58,6 @@ export default class extends uiBase {
   static css = `
     :host{
       vertical-align:var(--oi-icon-valign,middle) ;
-      
-    }
-    :host svg{
-      vertical-align:sub ;
     }
   `;
 

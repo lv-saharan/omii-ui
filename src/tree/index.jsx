@@ -22,6 +22,7 @@ export default class extends uiBase {
     checkedKeys: [], //多選
     radioedKey: null, //單選
     nodes: [], //節點
+    expander: <oi-icon name="keyboard_arrow_right" class="expander" />
   };
   static propTypes = {
     ignoreAttrs: Boolean,

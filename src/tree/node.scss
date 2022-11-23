@@ -12,6 +12,7 @@
             user-select: none;
             cursor: pointer;
             position: relative;
+            align-items: center;
             font: var(--oi-tree-node-font);
 
             .label {
@@ -19,29 +20,22 @@
             }
 
 
-            .expander {
-                width: 1rem;
-                padding-left: .3rem;
+            .expander-wrap {
+                margin-right: .3rem;
+                width: 1.2rem;
+                align-items: center;
+                display: flex;
 
-                &::after {
-                    display: block;
-                    content: ' ';
-                    width: 0;
-                    height: 0;
-                    border: .5rem solid transparent;
-                    border-left-color: black;
-                    transition: transform .36s ease;
-                }
-
-                &.no-children::after {
-                    display: none;
+                >oi-icon {
+                    display: flex;
+                    transition: transform .35s ease;
                 }
             }
 
             &:hover {
                 background-color: var(--oi-tree-node-hover-bgcolor, #cfe2ff);
                 color: var(--oi-tree-node-hover-color, black);
-                --oi-tree-node-expander-color: black;
+                --oi-tree-node-expander-wrap-color: black;
 
             }
 
@@ -96,11 +90,12 @@
         }
 
         &.expanded {
-            .expander {
-                &::after {
-                    transform: rotate(45deg);
-                    transform-origin: left center;
+            .expander-wrap {
+                >oi-icon {
+                    transform: rotate(90deg);
+                    transform-origin: center center;
                 }
+
 
             }
 

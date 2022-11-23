@@ -19,6 +19,7 @@ class TreeNode extends uiBase {
     cssss: null,
     nodeLevel: 0,
     ignoreAttrs: true,
+    expander: null
   };
   static propTypes = {
     nodeLevel: Number,
@@ -55,6 +56,10 @@ class TreeNode extends uiBase {
     return this.node.expanded ?? this.tree.isExpanded(this.key);
   }
 
+  get expander() {
+    return this.node.expander ?? this.$props.expander ?? this.tree.$props.expander
+  }
+
   get node() {
     return this.$props.node ?? {};
   }
@@ -67,6 +72,7 @@ class TreeNode extends uiBase {
   get nodes() {
     return this.#nodes;
   }
+
   get noChildren() {
     return !this.nodes || this.nodes.length == 0;
   }
@@ -283,13 +289,13 @@ class TreeNode extends uiBase {
         {this.expanded &&
           (children instanceof Array
             ? children.map((child) => (
-                <oi-tree-node
-                  node={child}
-                  node-level={this.level + 1}
-                  tree={this.tree}
-                  cssss={cssss}
-                />
-              ))
+              <oi-tree-node
+                node={child}
+                node-level={this.level + 1}
+                tree={this.tree}
+                cssss={cssss}
+              />
+            ))
             : children)}
       </div>
     );
@@ -317,8 +323,10 @@ class TreeNode extends uiBase {
               evt.stopPropagation();
               this.toggle();
             }}
-            class={classNames("expander", { "no-children": this.noChildren })}
-          ></div>
+            class={classNames("expander-wrap", { "no-children": this.noChildren })}
+          >
+            {!this.noChildren && this.expander}
+          </div>
           {this.$checkbox}
           {this.$radio}
           <div class="label">{$element}</div>

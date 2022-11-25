@@ -78,15 +78,20 @@ export default class extends uiBase {
     this.$props.value = val;
   }
   get validity() {
-    const { required, values, min, max } = this.$props;
+    const { required, values, min, max, multiple } = this.$props;
     const result = {
       valid: true,
     };
-    if (required && (!values || values.length == 0)) {
+    if (
+      required &&
+      ((multiple && (!values || values.length == 0)) ||
+        this.value == null ||
+        this.value == "")
+    ) {
       result.valid = false;
       result.valueMissing = true;
     }
-    if (result.valid) {
+    if (result.valid && multiple) {
       if (min != 0 && min > values.length) {
         result.valid = false;
         result.rangeUnderflow = true;
@@ -127,6 +132,12 @@ export default class extends uiBase {
     this.addEventListener("focus", (evt) => {
       this.showOptions();
     });
+    this.addEventListener("blur", (evt) => {
+      this.#activeIndex = false;
+      this.#searchKey = null;
+      this.hideOptions();
+      this.updateSelf();
+    });
     const { options } = this.$props;
     this.addEventListener("keydown", (evt) => {
       const keys = ["Enter", "ArrowUp", "ArrowDown"];
@@ -134,6 +145,8 @@ export default class extends uiBase {
       if (keys.includes(evt.key)) {
         evt.preventDefault();
         evt.stopPropagation();
+      } else {
+        return false
       }
       const $lis = this.#searchKey
         ? this.$$("li.option.match")
@@ -147,6 +160,10 @@ export default class extends uiBase {
           $li.classList.remove("active");
         });
         if (evt.key == "Enter") {
+          if (this.#activeIndex === false) {
+            this.#activeIndex = 0;
+          }
+          this.#searchKey = null;
           this.hideOptions();
         } else if (evt.key == "ArrowUp") {
           if (this.#activeIndex === false) {
@@ -165,13 +182,14 @@ export default class extends uiBase {
         if ($active) {
           $active.classList.add("active");
           const activeOption = options.at($active.dataset.index);
-          this.value = activeOption?.value;
-          this.updateSelf();
+          this.toggleOption(activeOption, false)
+          // this.value = activeOption?.value;
+          // this.updateSelf();
         }
       }
     });
   }
-  toggleOption(option) {
+  toggleOption(option, hideOptions = true) {
     const { values, multiple } = this.$props;
 
     if (multiple) {
@@ -183,16 +201,18 @@ export default class extends uiBase {
       }
     } else {
       this.value = option.value;
-      this.hideOptions();
+      if (hideOptions)
+        this.hideOptions();
     }
 
     this.#searchKey = null;
     this.updateSelf();
     if (this.#checked) this.checkValidity();
+    this.fire("change", multiple ? { value: this.value } : { values })
   }
   #searchKey;
   #activeIndex = false;
- 
+
   render() {
     let {
       values,
@@ -265,11 +285,6 @@ export default class extends uiBase {
               }
               onFocus={(evt) => {
                 this.showOptions();
-              }}
-              onBlur={(evt) => {
-                this.#activeIndex = false;
-                this.#searchKey = null;
-                this.updateSelf();
               }}
               onInput={(evt) => {
                 this.#searchKey = evt.target.value;

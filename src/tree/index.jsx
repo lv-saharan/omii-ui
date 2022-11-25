@@ -45,7 +45,7 @@ export default class extends uiBase {
     return this.$props.selectedKey;
   }
 
-  get expandedKyes() {
+  get expandedKeys() {
     return this.$props.expandedKeys;
   }
   get checkedKeys() {
@@ -134,7 +134,7 @@ export default class extends uiBase {
   expand(key, update = true) {
     let { expandedKeys } = this.$props;
     let index = expandedKeys.indexOf(key);
-    if (index != -1) expandedKeys.push(key);
+    if (index == -1) expandedKeys.push(key);
     if (update) this.update();
   }
   collapse(key, update = true) {
@@ -186,6 +186,9 @@ export default class extends uiBase {
       this.#nodes = nodes;
     }
     return this.#nodes;
+  }
+  set nodes(value) {
+    this.#nodes = value;
   }
   render() {
     let host = getHost(this);

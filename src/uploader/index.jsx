@@ -5,6 +5,8 @@ import { getCSSStyleSheets } from "../css";
 import pictures from "./templates/pictures";
 import files from "./templates/files";
 import { getExtension, getName } from "../utils";
+import { creatPreviewUrl } from "preview-utils";
+
 const Templates = { pictures, files };
 const STATUS = {
   NONE: "NONE",
@@ -13,6 +15,7 @@ const STATUS = {
   ERROR: "ERROR",
 };
 export default class extends uiBase {
+  static creatPreviewUrl = creatPreviewUrl
   static get STATUS() {
     return STATUS;
   }
@@ -56,10 +59,13 @@ export default class extends uiBase {
   open(index = -1) {
     this.#replaceIndex = index;
     this.$("#files").click();
+    this.fire("open", { index })
   }
   remove(index) {
     this.$props.files?.splice(index, 1);
     this.updateSelf();
+    this.fire("remove", { index })
+
   }
 
   select(files) {
@@ -99,7 +105,7 @@ export default class extends uiBase {
     if (autoUpload === true) this.upload();
   }
   refresh() {
-    this.update();
+    this.forceUpdate();
   }
   upload() {
     let { files, action, withCredentials, headers } = this.$props;
@@ -123,11 +129,16 @@ export default class extends uiBase {
         }
       }
       xhr.send(fd);
-      xhr.onreadystatechange = function (args) {
+      xhr.onreadystatechange = (args) => {
         if (xhr.readyState === 4 && xhr.status === 200) {
           console.log("上传成功");
-          let data = JSON.parse(xhr.responseText);
-          Object.assign(file, data);
+          let data = xhr.responseText;
+          try {
+            data = JSON.parse(data)
+          } catch (exc) {
+            console.error(exc)
+          }
+          // Object.assign(file, data);
           this.fire("uploaded", { file, data });
           this.refresh();
         } else {
@@ -136,7 +147,7 @@ export default class extends uiBase {
         }
       };
       //监听文件上传（xhr.upload）进度
-      xhr.upload.onprogress = function (e) {
+      xhr.upload.onprogress = e => {
         if (e.lengthComputable) {
           let percentage = Math.ceil((e.loaded / e.total) * 100);
           file.progress = percentage;

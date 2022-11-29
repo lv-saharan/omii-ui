@@ -87,8 +87,12 @@ export default class extends uiBase {
 
   set value(value) {
     this.$props.value = value;
-    if (this.editor) {
-      this.editor.setContent(value);
+    if (this.editor && this.#ready) {
+      try {
+        this.editor.setContent(value);
+      } catch (exc) {
+        console.log("editor not init")
+      }
     }
     //这里不能fire change，这样容易引起循环调用
     //监控change的控件可能会继续调用update
@@ -129,10 +133,15 @@ export default class extends uiBase {
     return valid;
   }
 
+  get editorId() {
+    return `editor${this.elementId}`
+  }
+  #ready = false
+
   async installed() {
     // console.log("tiny installed");
     await import(new URL(this.constructor.jsFile, this.constructor.root).href);
-    const $editor = this.$("#editor");
+    const $editor = this.$(`#${this.editorId}`);
     const {
       menu,
       menubar,
@@ -206,6 +215,9 @@ export default class extends uiBase {
       importcss_append: importcssAppend,
       setup: (editor) => {
         this.#editor = editor;
+        editor.on("init", e => {
+          this.#ready = true
+        })
         editor.on("change", (e) => {
           this.$props.value = editor.getContent();
           this.fire("change", { value: this.value });
@@ -216,7 +228,8 @@ export default class extends uiBase {
   render() {
     return (
       <textarea
-        id="editor"
+        class="editor"
+        id={this.editorId}
         value={this.value}
         placeholder={this.placeholder}
       ></textarea>

@@ -113,15 +113,31 @@ export default class extends uiBase {
   }
 
   installed() {
-    this.#$reference.addEventListener("click", (evt) => {
-      if ($visibleDropDown && $visibleDropDown != this) $visibleDropDown.hide();
-      this.toggle();
-      evt.preventDefault();
-      evt.stopPropagation();
-    });
+    const { trigger } = this.$props
 
+    if (trigger == "click") {
+      this.#$reference.addEventListener("click", (evt) => {
+        if ($visibleDropDown && $visibleDropDown != this) $visibleDropDown.hide();
+        evt.preventDefault();
+        evt.stopImmediatePropagation();
+        this.toggle();
+      });
+    } else if (trigger == "focus") {
+      this.#$reference.addEventListener("focus", (evt) => {
+        if ($visibleDropDown && $visibleDropDown != this) $visibleDropDown.hide();
+        evt.preventDefault();
+        evt.stopImmediatePropagation();
+        this.show();
+      });
+      this.#$reference.addEventListener("blur", (evt) => {
+        evt.preventDefault();
+        evt.stopImmediatePropagation();
+        this.hide();
+      });
+
+    }
     this.addEventListener("click", (evt) => {
-      evt.stopPropagation();
+      evt.stopImmediatePropagation();
     });
   }
   render(props) {

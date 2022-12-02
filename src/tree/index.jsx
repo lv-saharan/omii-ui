@@ -175,20 +175,17 @@ export default class extends uiBase {
       });
     }
   }
-  #nodes;
+
   get nodes() {
-    if (!this.#nodes) {
-      let nodes = this.$props.nodes;
-      let host = getHost(this);
-      if (typeof nodes === "function") {
-        nodes = nodes.call(host);
-      }
-      this.#nodes = nodes;
+    let nodes = this.$props.nodes;
+    let host = getHost(this);
+    if (typeof nodes === "function") {
+      nodes = nodes.call(host);
     }
-    return this.#nodes;
+    return nodes;
   }
   set nodes(value) {
-    this.#nodes = value;
+    this.$props.nodes = value;
   }
   render() {
     let host = getHost(this);

@@ -197,9 +197,7 @@ class TreeNode extends uiBase {
     ) : null;
   }
   install() {
-    if (!this.tree.$props.multiSelect && this.selected) {
-      this.tree.__selectedNode = this;
-    }
+  
   }
   #Sortable;
   get Sortable() {
@@ -266,6 +264,11 @@ class TreeNode extends uiBase {
   }
   async render(props) {
     let { node, cssss } = props;
+    
+    if (!this.tree.$props.multiSelect && this.selected) {
+      this.tree.__selectedNode = this;
+    }
+
     let $element = node.element ?? node.label ?? node.key;
     if (typeof $element == "function") {
       $element = await $element(node, props, this);

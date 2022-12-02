@@ -12,11 +12,13 @@ export default class extends uiBase {
     placeholder: String,
     required: Boolean,
     inline: Boolean,
+    readonly: Boolean
   };
   static defaultProps = {
     //编辑器引擎
     value: "",
     placeholder: "...",
+    readonly: false,
     required: false,
     language: "zh-Hans",
     directionality: null,
@@ -49,6 +51,13 @@ export default class extends uiBase {
     imagesUploadCredentials: false,
     imagesReuseFilename: false,
     imagesFileTypes: null,
+    imageList: null,
+    imageAdvtab: true,
+    imageUploadtab: false,
+    imageDimensions: true,
+    imageTitle: true,
+    imagePrependUrl: null,
+    imageBatch: false,
     automaticUploads: true,
     filePickerTypes: null,
     filePickerCallback: null,
@@ -81,6 +90,9 @@ export default class extends uiBase {
     jsFile = value;
   }
 
+  static async use() {
+    return await import(new URL(this.jsFile, this.root).href);
+  }
   get value() {
     return this.$props.value;
   }
@@ -140,7 +152,7 @@ export default class extends uiBase {
 
   async installed() {
     // console.log("tiny installed");
-    await import(new URL(this.constructor.jsFile, this.constructor.root).href);
+    await this.constructor.use()
     const $editor = this.$(`#${this.editorId}`);
     const {
       menu,
@@ -151,6 +163,7 @@ export default class extends uiBase {
       toolbarMode,
       baseUrl,
       inline,
+      readonly,
       contentStyle,
       contentCss,
       fontFamilyFormats,
@@ -169,6 +182,13 @@ export default class extends uiBase {
       imagesUploadCredentials,
       imagesReuseFilename,
       imagesFileTypes,
+      imageList,
+      imageBatch,
+      imageAdvtab,
+      imageUploadtab,
+      imageDimensions,
+      imageTitle,
+      imagePrependUrl,
       automaticUploads,
       filePickerTypes,
       filePickerCallback,
@@ -187,6 +207,7 @@ export default class extends uiBase {
       plugins,
       language,
       inline,
+      readonly,
       extended_valid_elements: "oi-icon[name|color|size]",
       custom_elements: "oi-icon",
       content_css: contentCss,
@@ -207,6 +228,12 @@ export default class extends uiBase {
       images_upload_credentials: imagesUploadCredentials,
       images_reuse_filename: imagesReuseFilename,
       images_file_types: imagesFileTypes,
+      image_list: imageList,
+      image_advtab: imageAdvtab,
+      image_uploadtab: imageUploadtab,
+      image_dimensions: imageDimensions,
+      image_title: imageTitle,
+      image_prepend_url: imagePrependUrl,
       automatic_uploads: automaticUploads,
       file_picker_types: filePickerTypes,
       file_picker_callback: filePickerCallback,
@@ -215,8 +242,14 @@ export default class extends uiBase {
       importcss_append: importcssAppend,
       setup: (editor) => {
         this.#editor = editor;
+        this.fire("setup", { editor })
+
         editor.on("init", e => {
           this.#ready = true
+          this.fire("ready")
+        })
+        editor.on("blur", e => {
+          console.log("editor blur")
         })
         editor.on("change", (e) => {
           this.$props.value = editor.getContent();
@@ -226,7 +259,10 @@ export default class extends uiBase {
     });
   }
   render() {
-    return (
+    const { inline } = this.$props
+    return inline ? <div >
+      <div class="editor" id={this.editorId}>{this.value}</div>
+    </div> : (
       <textarea
         class="editor"
         id={this.editorId}

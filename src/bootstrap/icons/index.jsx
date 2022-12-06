@@ -44,6 +44,9 @@ export default class extends uiBase {
     :host{
       vertical-align:var(--oi-bicon-valign,middle) ;
     }
+    svg{
+      vertical-align:var(--oi-bicon-valign,middle) ;
+    }
   `;
 
   css() {

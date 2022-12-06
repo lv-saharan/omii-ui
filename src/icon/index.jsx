@@ -59,6 +59,9 @@ export default class extends uiBase {
     :host{
       vertical-align:var(--oi-icon-valign,middle) ;
     }
+    svg{
+      vertical-align:var(--oi-icon-valign,middle) ;
+    }
   `;
 
   static useBundleMode() {

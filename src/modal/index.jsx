@@ -1,9 +1,11 @@
 const { h, classNames, extractClass } = omii;
-import { createPopper } from '@popperjs/core';
+// import { createPopper } from '@popperjs/core';
 import uiBase from "../uiBase";
-import { getCSSStyleSheets } from "../css";
+import { getCSSStyleSheets, timingClassNames } from "../css";
 import css from "./index.scss";
-import effect from "../effect";
+// import effect from "../effect";
+
+
 
 export default class extends uiBase {
   static css = [
@@ -31,16 +33,32 @@ export default class extends uiBase {
     fullscreen: Boolean,
   };
   open() {
-    this.update$Props({ visible: true });
+    this.update$Props({ visible: true }).then(() => {
+      timingClassNames(this.$dialog, [{
+        classNames: "show",
+      }])
+    })
+
     this.fire("open");
   }
   close() {
-    effect.fade.hide(this.$(".modal-backdrop")).then(() => {
-      this.update$Props({ visible: false });
-      this.fire("close");
-    });
+    timingClassNames(this.$dialog, [{
+      classNames: "show",
+    }, {
+      classNames: "",
+      duration: .15,
+    }, {
+      classNames: "",
+      callback: () => {
+        this.update$Props({ visible: false });
+      }
+    }])
+    this.fire("close");
   }
 
+  get $dialog() {
+    return this.$(".modal-dialog")
+  }
   css() { }
 
   render(props) {
@@ -48,14 +66,14 @@ export default class extends uiBase {
     return (
       <>
         {settings.visible && !settings.staticPosition && (
-          <div class={classNames("modal-backdrop", "fade", "show")}></div>
+          <div class={classNames("modal-backdrop", "show")}></div>
         )}
         <div
           {...extractClass(props, "modal", {
             "position-static": settings.staticPosition,
             "d-block": settings.staticPosition || settings.visible,
-            fade: true,
-            show: true,
+            // fade: true,
+            // show: true,
           })}
           tabindex="-1"
           role="dialog"

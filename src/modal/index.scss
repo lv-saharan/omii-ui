@@ -1,0 +1,14 @@
+.modal {
+    &.position-static {
+        .modal-dialog {}
+    }
+
+    .modal-dialog {
+        transition: margin-top .35s ease;
+        margin-top: 0;
+
+        &.show {
+            margin-top: var(--oi-modal-margin);
+        }
+    }
+}

@@ -41,10 +41,17 @@ export default class extends uiBase {
           },
           { ignoreAttrs: true, updateSelf: true }
         );
+
+        
       }
     }
   }
 
+  get slotPanes() {
+    const slot = this.$("slot")
+    const panes = slot?.assignedElements()
+    return panes
+  }
   async render(props) {
     let settings = this.$props;
     let items = props.items ?? settings.items;
@@ -86,7 +93,10 @@ export default class extends uiBase {
     return (
       <div class="tabs">
         <div class="navs">{$navs}</div>
-        <div class="panes">{$panes}</div>
+        <div class="panes">
+          {$panes}
+          <slot></slot>
+        </div>
       </div>
     );
   }

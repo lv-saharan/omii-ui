@@ -1,12 +1,14 @@
 const { h, classNames, extractClass } = omii;
 import uiBase from "../uiBase";
 import css from "./index.scss";
+import { getCSSStyleSheets } from "../css";
+
 //min.js
 let min = true;
 let root = new URL(`./tinymce/`, import.meta.url).href;
 let jsFile = `./tinymce.js`;
 export default class extends uiBase {
-  static css = css;
+  static css = [() => getCSSStyleSheets("reboot", "scrollbar"), css];
   static propTypes = {
     value: String,
     placeholder: String,
@@ -17,6 +19,13 @@ export default class extends uiBase {
   static defaultProps = {
     //编辑器引擎
     value: "",
+    width: null,
+    height: null,
+    minWidth: null,
+    minHeight: null,
+    maxWidth: null,
+    maxHeight: null,
+    resize: true,
     placeholder: "...",
     readonly: false,
     required: false,
@@ -195,6 +204,13 @@ export default class extends uiBase {
       templates,
       importcssGroups,
       importcssAppend,
+      width,
+      height,
+      minWidth,
+      minHeight,
+      maxWidth,
+      maxHeight,
+      resize,
     } = this.$props;
     tinymce.init({
       target: $editor,
@@ -240,6 +256,13 @@ export default class extends uiBase {
       importcss_groups: importcssGroups,
       templates,
       importcss_append: importcssAppend,
+      width,
+      height,
+      min_width: minWidth,
+      min_height: minHeight,
+      max_width: maxWidth,
+      max_height: maxHeight,
+      resize,
       setup: (editor) => {
         this.#editor = editor;
         this.fire("setup", { editor })

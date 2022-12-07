@@ -7,6 +7,9 @@ import { getCSSStyleSheets } from "../css";
 let min = true;
 let root = new URL(`./tinymce/`, import.meta.url).href;
 let jsFile = `./tinymce.js`;
+const tinyCache = []
+let hasImported = false
+
 export default class extends uiBase {
   static css = [() => getCSSStyleSheets("reboot", "scrollbar"), css];
   static propTypes = {
@@ -100,7 +103,21 @@ export default class extends uiBase {
   }
 
   static async use() {
-    return await import(new URL(this.jsFile, this.root).href);
+    if (hasImported) {
+      return
+    }
+    if (tinyCache.length == 0) {
+      await import(new URL(this.jsFile, this.root).href).then(() => {
+        hasImported = true
+        tinyCache.forEach(({ resolve }) => {
+          resolve()
+        })
+      })
+    }
+    return new Promise((resolve, reject) => {
+      tinyCache.push({ resolve, reject })
+    })
+
   }
   get value() {
     return this.$props.value;

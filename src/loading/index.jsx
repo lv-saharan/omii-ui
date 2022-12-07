@@ -1,6 +1,7 @@
 const { h, classNames } = omii;
 import uiBase from "../uiBase";
 
+const loadingCache = new Map();
 export default class extends uiBase {
   static updateOnAttributeChanged = true;
   static css = `
@@ -56,11 +57,38 @@ export default class extends uiBase {
     `;
   }
 
-  async render() {
+  async getLoadingConfig() {
     let { name } = this.$props;
-    let {
-      default: { template, css },
-    } = await import(`./loadings/${name}.js`);
+    const key = name
+    let loadingConfig = loadingCache.get(key)
+    if (loadingConfig == undefined) {
+      loadingConfig = []
+      loadingCache.set(key, loadingConfig)
+      try {
+        const { default: config } = await import(`./loadings/${name}.js`)
+        loadingCache.set(key, config)
+        for (let { resolve } of loadingConfig) {
+          resolve(config)
+        }
+        return config
+      } catch {
+        // console.info("icon load error", type, name)
+        loadingCache.set(key, null)
+        for (let { resolve } of loadingConfig) {
+          resolve(null)
+        }
+        return null;
+      }
+    }
+    if (loadingConfig instanceof Array) {
+      return new Promise((resolve, reject) => {
+        loadingConfig.push({ resolve, reject })
+      })
+    }
+    return loadingConfig
+  }
+  async render() {
+    const { template, css } = await this.getLoadingConfig()
     this.#css = css;
     return template;
   }

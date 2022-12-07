@@ -7,7 +7,7 @@ import files from "./templates/files";
 import { getExtension, getName } from "../utils";
 import { creatPreviewUrl } from "preview-utils";
 
-const Templates = { pictures, files };
+const Templates = { pictures, files, none: null };
 const STATUS = {
   NONE: "NONE",
   UPLOADING: "UPLOADING",

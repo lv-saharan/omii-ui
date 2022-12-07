@@ -2,12 +2,42 @@ const { h } = omii;
 
 import uiBase from "../../uiBase";
 
+const singleCache = new Map()
+
 const loadIcon = async (name) => {
   try {
-    let { default: icon } = await import(`./bootstrap/icons/${name}.js`);
-    return icon;
+    const key = name;
+    let cacheIcon = singleCache.get(key)
+    if (cacheIcon == undefined) {
+      cacheIcon = []
+      singleCache.set(key, cacheIcon)
+      try {
+        const { default: icon } = await import(`./bootstrap/icons/${name}.js`)
+        singleCache.set(key, icon)
+        for (let { resolve } of cacheIcon) {
+          resolve(icon)
+        }
+        return icon
+      } catch {
+        // console.info("icon load error", type, name)
+        singleCache.set(key, null)
+        for (let { resolve } of cacheIcon) {
+          resolve(null)
+        }
+        return null;
+      }
+    }
+    if (cacheIcon instanceof Array) {
+      return new Promise((resolve, reject) => {
+        cacheIcon.push({ resolve, reject })
+      })
+    }
+    return cacheIcon
+
+    // let { default: icon } = await import(`./bootstrap/icons/${name}.js`);
+    // return icon;
   } catch {
-    console.error("load icon error", name, type);
+    console.error("load icon error", name);
   }
 };
 const createSvg = async (name, props = {}) => {

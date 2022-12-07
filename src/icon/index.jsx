@@ -6,6 +6,9 @@ import { MODES, TYPES } from "./constants";
 let MODE = MODES.SINGLE;
 let TYPE = TYPES.FILLED;
 
+const singleCache = new Map()
+
+
 const loadIcon = async (name, type, mode) => {
   type = type ?? TYPE;
   if (type == TYPES.FILE_TYPE) {
@@ -16,10 +19,38 @@ const loadIcon = async (name, type, mode) => {
       let { default: icons } = await import(`./icons/${type}.js`);
       return icons[name];
     } else {
-      let { default: icon } = await import(`./icons/${type}/${name}.js`);
-      return icon;
+      // const { default: icon } = await import(`./icons/${type}/${name}.js`)
+      // return icon;
+      const key = `${type}:${name}`
+      let cacheIcon = singleCache.get(key)
+      if (cacheIcon == undefined) {
+        cacheIcon = []
+        singleCache.set(key, cacheIcon)
+        try {
+          const { default: icon } = await import(`./icons/${type}/${name}.js`)
+          singleCache.set(key, icon)
+          for (let { resolve } of cacheIcon) {
+            resolve(icon)
+          }
+          return icon
+        } catch {
+          // console.info("icon load error", type, name)
+          singleCache.set(key, null)
+          for (let { resolve } of cacheIcon) {
+            resolve(null)
+          }
+          return null;
+        }
+      }
+      if (cacheIcon instanceof Array) {
+        return new Promise((resolve, reject) => {
+          cacheIcon.push({ resolve, reject })
+        })
+      }
+      return cacheIcon
     }
   } catch {
+
     console.error("load icon error", name, type);
   }
 };
@@ -30,7 +61,6 @@ const createSvg = async (name, type, mode, props = {}) => {
     {
       xmlns: "http://www.w3.org/2000/svg",
       viewBox: "0 0 24 24",
-      part: "svg",
       ...props,
     },
     icon
@@ -108,9 +138,8 @@ export default class extends uiBase {
 
     return (
       <svg
-        part="svg"
         xmlns="http://www.w3.org/2000/svg"
-        viewBox={"0 0 " + viewBox + " " + viewBox}
+        viewBox={`0 0 ${viewBox} ${viewBox}`}
       >
         {$icon}
       </svg>

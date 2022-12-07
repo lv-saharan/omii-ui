@@ -3,6 +3,7 @@ import uiBase from "../uiBase";
 import css from "./index.scss";
 let root = new URL(`./echarts/`, import.meta.url).href;
 let jsFile = "echarts.esm.min.js";
+let ECharts = null;
 export default class extends uiBase {
   static css = css;
   static propTypes = {};
@@ -35,9 +36,12 @@ export default class extends uiBase {
     return this.#echart;
   }
   async installed() {
-    const echarts = await import(
-      new URL(this.constructor.jsFile, this.constructor.root).href
-    );
+    let echarts = ECharts;
+    if (!echarts) {
+      echarts = ECharts = await import(
+        new URL(this.constructor.jsFile, this.constructor.root).href
+      );
+    }
     this.#echart = echarts.init(this.$("main"));
     this.draw();
   }

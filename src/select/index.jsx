@@ -204,8 +204,8 @@ export default class extends uiBase {
       if (hideOptions)
         this.hideOptions();
     }
-
-    this.#searchKey = null;
+    if (hideOptions)
+      this.#searchKey = null;
     this.updateSelf();
     if (this.#checked) this.checkValidity();
     this.fire("change", multiple ? { value: this.value } : { values })

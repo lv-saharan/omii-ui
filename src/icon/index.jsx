@@ -6,9 +6,7 @@ import { MODES, TYPES } from "./constants";
 let MODE = MODES.SINGLE;
 let TYPE = TYPES.FILLED;
 
-const singleCache = new Map()
-
-
+const iconsCache = new Map()
 const loadIcon = async (name, type, mode) => {
   type = type ?? TYPE;
   if (type == TYPES.FILE_TYPE) {
@@ -22,36 +20,38 @@ const loadIcon = async (name, type, mode) => {
       // const { default: icon } = await import(`./icons/${type}/${name}.js`)
       // return icon;
       const key = `${type}:${name}`
-      let cacheIcon = singleCache.get(key)
-      if (cacheIcon == undefined) {
-        cacheIcon = []
-        singleCache.set(key, cacheIcon)
+      let cachedIcon = iconsCache.get(key)
+      if (cachedIcon == undefined) {
+        cachedIcon = {
+          icon: false,
+          resolves: []
+        }
+        iconsCache.set(key, cachedIcon)
         try {
           const { default: icon } = await import(`./icons/${type}/${name}.js`)
-          singleCache.set(key, icon)
-          for (let { resolve } of cacheIcon) {
-            resolve(icon)
-          }
-          return icon
-        } catch {
-          // console.info("icon load error", type, name)
-          singleCache.set(key, null)
-          for (let { resolve } of cacheIcon) {
-            resolve(null)
-          }
-          return null;
+          cachedIcon.icon = icon
         }
+        catch {
+          // console.info("icon load error", type, name)
+          cachedIcon.icon = null
+        }
+        for (let resolve of cachedIcon.resolves) {
+          resolve(cachedIcon.icon)
+        }
+        cachedIcon.resolves = []
+        return cachedIcon.icon
       }
-      if (cacheIcon instanceof Array) {
+
+      if (cachedIcon.icon === false) {
         return new Promise((resolve, reject) => {
-          cacheIcon.push({ resolve, reject })
+          cachedIcon.resolves.push(resolve)
         })
       }
-      return cacheIcon
+      return cachedIcon.icon
     }
-  } catch {
-
-    console.error("load icon error", name, type);
+  } catch (exc) {
+    console.error("load icon error", name, type, exc);
+    return null
   }
 };
 const createSvg = async (name, type, mode, props = {}) => {

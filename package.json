@@ -1,6 +1,6 @@
 {
   "name": "omii-ui",
-  "version": "1.0.27",
+  "version": "1.0.28",
   "description": "omi 兼容的ui库，样式采用bootstrap。可以作为标准的esmodule使用",
   "main": "src/index.jsx",
   "type": "module",

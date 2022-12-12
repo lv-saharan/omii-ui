@@ -135,6 +135,7 @@ export {
 
 export default {
     tryExtension,
+    getFileType,
     downloadUrl,
     getName,
     getExtension,

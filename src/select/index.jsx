@@ -48,22 +48,20 @@ export default class extends uiBase {
       );
     },
     createSelected(option, index) {
-      const { values } = this.$props;
+      const { values, multiple } = this.$props;
 
       return (
-        <li
-          onClick={(evt) => {
-            evt.stopImmediatePropagation();
-          }}
-        >
+        <li>
           {option.text}
           <oi-bi
             name="x"
             onClick={(evt) => {
+              evt.preventDefault();
+              evt.stopImmediatePropagation()
               values.splice(index, 1);
               this.updateSelf();
-              evt.stopPropagation();
               if (this.#checked) this.checkValidity();
+              this.fire("change", multiple ? { value: this.value } : { values })
             }}
           />
         </li>
@@ -76,6 +74,9 @@ export default class extends uiBase {
   }
   set value(val) {
     this.$props.value = val;
+  }
+  get values() {
+    return this.$props.values;
   }
   get validity() {
     const { required, values, min, max, multiple } = this.$props;
@@ -130,9 +131,13 @@ export default class extends uiBase {
     this.dataset.validate = true;
     this.setAttribute("tabIndex", 0);
     this.addEventListener("focus", (evt) => {
-      this.showOptions();
+      // this.showOptions();
+      this.$("input.value").focus();
+      this.$(".selected").classList.add("focus")
     });
     this.addEventListener("blur", (evt) => {
+      this.$(".selected").classList.remove("focus")
+
       this.#activeIndex = false;
       this.#searchKey = null;
       this.hideOptions();
@@ -255,71 +260,57 @@ export default class extends uiBase {
           }
         `}
       >
-        {multiple ? (
-          <div
-            class="selected d-flex"
-            onClick={(evt) => {
-              evt.stopImmediatePropagation();
-              // this.showOptions();
-            }}
-          >
-            <ul class="values">
-              {values.map((value, index) => {
-                const option = options.find((option) => option.value == value);
-                if (option) {
-                  return createSelected(option, index);
-                }
-              })}
-            </ul>
-            <input
-              className="value  flex-grow-1"
-              readOnly={!searchable}
-              onFocus={(evt) => {
-                this.showOptions();
-              }}
-              value={this.#searchKey}
-              onInput={(evt) => {
-                this.#searchKey = evt.target.value;
-                this.#activeIndex = false;
-                this.updateSelf();
-              }}
-            />
-
-            <oi-icon class="expander" name="keyboard_arrow_down" onClick={(evt) => {
-              this.showOptions();
-            }} />
-          </div>
-        ) : (
-          <div
-            className="selected d-flex"
-            onClick={(evt) => {
-              evt.stopImmediatePropagation();
-            }}
-          >
-            <input
-              className="value  flex-grow-1"
-              readOnly={!searchable}
-              value={
-                this.#searchKey ??
-                options.find((option) => option.value == value)?.text
+        <div
+          class="selected d-flex"
+          onClick={(evt) => {
+            this.$("input.value").focus();
+            evt.stopImmediatePropagation();
+            this.showOptions();
+          }}
+        > {multiple ?
+          <ul class="values d-flex flex-wrap">
+            {values.map((value, index) => {
+              const option = options.find((option) => option.value == value);
+              if (option) {
+                return createSelected(option, index);
               }
-              onFocus={(evt) => {
-                this.showOptions();
-              }}
-              onInput={(evt) => {
-                this.#searchKey = evt.target.value;
-                this.#activeIndex = false;
-                this.updateSelf();
-              }}
-            />
-            <div
-              class="expander"
-              onClick={(evt) => {
-                this.showOptions();
-              }}
-            ></div>
-          </div>
-        )}
+            })}
+            <li className="input">
+              <input
+                className="value"
+                readOnly={!searchable}
+                // onFocus={(evt) => {
+                //   this.showOptions();
+                // }}
+                value={this.#searchKey}
+                onInput={(evt) => {
+                  this.#searchKey = evt.target.value;
+                  this.#activeIndex = false;
+                  this.updateSelf();
+                }}
+              />
+            </li>
+          </ul> : <input
+            className="value  flex-grow-1"
+            readOnly={!searchable}
+            value={
+              this.#searchKey ??
+              options.find((option) => option.value == value)?.text
+            }
+            // onFocus={(evt) => {
+            //   this.showOptions();
+            // }}
+            onInput={(evt) => {
+              this.#searchKey = evt.target.value;
+              this.#activeIndex = false;
+              this.updateSelf();
+            }}
+          />}
+          <oi-icon class="expander ms-auto" name="keyboard_arrow_down" onClick={(evt) => {
+            this.showOptions();
+          }} />
+        </div>
+
         <ul
           className={classNames("dropdown-menu", {
             searching: this.#searchKey,
@@ -338,6 +329,7 @@ export default class extends uiBase {
               })}
               onClick={(evt) => {
                 this.toggleOption(option);
+
               }}
             >
               {createOption(option, index)}

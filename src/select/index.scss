@@ -1,11 +1,19 @@
 :host {
 
+
     .selected {
+        &.focus {
+            input.value {
+                width: 5em !important;
+            }
+        }
+
         width: 100%;
 
         .value {
             border: none;
             padding: 0;
+
             &:focus {
                 border: none;
                 outline: none;
@@ -17,24 +25,32 @@
         }
     }
 
+
     .values {
         margin: 0;
         padding: 0;
 
         li {
-            display: inline-block;
             list-style: none;
+            margin-bottom: .1em;
+            padding: 0.1rem .5rem;
+        }
+
+        input.value {
+            width: 0;
+        }
+
+
+        li:not(.input) {
             background-color: aliceblue;
             margin-right: .25em;
-            padding: 0 .5rem;
+
             border-radius: .5;
 
         }
     }
 
-    .expander {
-
-    }
+    .expander {}
 
 
 

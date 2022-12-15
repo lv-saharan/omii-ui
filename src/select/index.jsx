@@ -61,7 +61,7 @@ export default class extends uiBase {
               values.splice(index, 1);
               this.updateSelf();
               if (this.#checked) this.checkValidity();
-              this.fire("change", multiple ? { value: this.value } : { values })
+              this.fire("change", multiple ? { values } : { value: this.value })
             }}
           />
         </li>
@@ -85,9 +85,9 @@ export default class extends uiBase {
     };
     if (
       required &&
-      ((multiple && (!values || values.length == 0)) ||
+      ((multiple && (!values || values.length == 0)) || !multiple && (
         this.value == null ||
-        this.value == "")
+        this.value == ""))
     ) {
       result.valid = false;
       result.valueMissing = true;
@@ -223,7 +223,7 @@ export default class extends uiBase {
       this.#searchKey = null;
     this.updateSelf();
     if (this.#checked) this.checkValidity();
-    this.fire("change", multiple ? { value: this.value } : { values })
+    this.fire("change", multiple ? { values } : { value: this.value })
   }
   #searchKey;
   #activeIndex = false;

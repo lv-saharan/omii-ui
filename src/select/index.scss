@@ -5,13 +5,14 @@
 
         .value {
             border: none;
-
+            padding: 0;
             &:focus {
                 border: none;
                 outline: none;
             }
         }
-        oi-bi{
+
+        oi-bi {
             vertical-align: initial;
         }
     }
@@ -33,17 +34,6 @@
 
     .expander {
 
-        &::after {
-            content: " ";
-            margin-top: 50%;
-            display: block;
-            width: 0;
-            height: 0;
-            border: solid .25em transparent;
-            border-top-color: black;
-            margin-right: .5em;
-        }
-
     }
 
 
@@ -61,6 +51,7 @@
         margin-top: 0.375rem;
         max-height: 26em;
         overflow: scroll;
+
         &.searching {
             li {
                 display: none;

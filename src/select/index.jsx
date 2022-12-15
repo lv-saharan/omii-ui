@@ -138,7 +138,7 @@ export default class extends uiBase {
       this.hideOptions();
       this.updateSelf();
     });
-    const { options } = this.$props;
+    const { options, multiple, values } = this.$props;
     this.addEventListener("keydown", (evt) => {
       const keys = ["Enter", "ArrowUp", "ArrowDown"];
 
@@ -164,6 +164,7 @@ export default class extends uiBase {
             this.#activeIndex = 0;
           }
           this.#searchKey = null;
+
           this.hideOptions();
         } else if (evt.key == "ArrowUp") {
           if (this.#activeIndex === false) {
@@ -177,12 +178,21 @@ export default class extends uiBase {
           } else if (this.#activeIndex < $lis.length - 1) {
             this.#activeIndex++;
           }
+          this.showOptions()
+        } else if (evt.key == "Backspace") {
+          // if (multiple && values.length > 0) {
+          //   values.splice(values.length - 1, 1)
+          //   this.updateSelf();
+          //   return
+          // }
         }
         const $active = $lis[this.#activeIndex];
         if ($active) {
           $active.classList.add("active");
-          const activeOption = options.at($active.dataset.index);
-          this.toggleOption(activeOption, false)
+          if (!multiple || evt.key == "Enter") {
+            const activeOption = options.at($active.dataset.index);
+            this.toggleOption(activeOption, false)
+          }
           // this.value = activeOption?.value;
           // this.updateSelf();
         }
@@ -253,8 +263,7 @@ export default class extends uiBase {
               // this.showOptions();
             }}
           >
-            &nbsp;
-            <ul class="values flex-grow-1">
+            <ul class="values">
               {values.map((value, index) => {
                 const option = options.find((option) => option.value == value);
                 if (option) {
@@ -262,12 +271,23 @@ export default class extends uiBase {
                 }
               })}
             </ul>
-            <div
-              class="expander"
-              onClick={(evt) => {
+            <input
+              className="value  flex-grow-1"
+              readOnly={!searchable}
+              onFocus={(evt) => {
                 this.showOptions();
               }}
-            ></div>
+              value={this.#searchKey}
+              onInput={(evt) => {
+                this.#searchKey = evt.target.value;
+                this.#activeIndex = false;
+                this.updateSelf();
+              }}
+            />
+
+            <oi-icon class="expander" name="keyboard_arrow_down" onClick={(evt) => {
+              this.showOptions();
+            }} />
           </div>
         ) : (
           <div

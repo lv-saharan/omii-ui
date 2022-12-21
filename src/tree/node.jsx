@@ -154,6 +154,7 @@ class TreeNode extends uiBase {
       this.node.allowCheck !== false ? (
         <input
           type="checkbox"
+          class="form-check-input"
           disabled={this.node.disabled === true}
           checked={this.checked}
           onClick={(evt) => {

@@ -33,17 +33,17 @@ export default class extends uiBase {
 
       return (
         <div class="form-check d-flex">
-          {multiple && (
+          { multiple && (
             <input
               class="form-check-input"
               type="checkbox"
-              value={option.value}
-              id={`option${index}`}
-              checked={values.includes(option.value)}
+              value={ option.value }
+              id={ `option${index}` }
+              checked={ values.includes(option.value) }
             />
-          )}
+          ) }
 
-          <label class="form-check-label flex-grow-1">{option.text}</label>
+          <label class="form-check-label flex-grow-1">{ option.text }</label>
         </div>
       );
     },
@@ -52,17 +52,17 @@ export default class extends uiBase {
 
       return (
         <li>
-          {option.text}
+          { option.text }
           <oi-bi
             name="x"
-            onClick={(evt) => {
+            onClick={ (evt) => {
               evt.preventDefault();
               evt.stopImmediatePropagation()
               values.splice(index, 1);
               this.updateSelf();
               if (this.#checked) this.checkValidity();
               this.fire("change", multiple ? { values } : { value: this.value })
-            }}
+            } }
           />
         </li>
       );
@@ -254,45 +254,48 @@ export default class extends uiBase {
     return (
       <oi-dropdown
         placement="bottom-start"
-        css={`
-          slot[name="menu"] {
-            width: 100%;
+        css={ `
+          :host slot:not([name]) {
+            display: block;
+          }
+          :host slot[name="menu"] {
+            width:100%;
           }
         `}
       >
         <div
           class="selected d-flex"
-          onClick={(evt) => {
+          onClick={ (evt) => {
             this.$("input.value").focus();
             evt.stopImmediatePropagation();
             this.showOptions();
-          }}
-        > {multiple ?
+          } }
+        > { multiple ?
           <ul class="values d-flex flex-wrap">
-            {values.map((value, index) => {
+            { values.map((value, index) => {
               const option = options.find((option) => option.value == value);
               if (option) {
                 return createSelected(option, index);
               }
-            })}
+            }) }
             <li className="input">
               <input
                 className="value"
-                readOnly={!searchable}
+                readOnly={ !searchable }
                 // onFocus={(evt) => {
                 //   this.showOptions();
                 // }}
-                value={this.#searchKey}
-                onInput={(evt) => {
+                value={ this.#searchKey }
+                onInput={ (evt) => {
                   this.#searchKey = evt.target.value;
                   this.#activeIndex = false;
                   this.updateSelf();
-                }}
+                } }
               />
             </li>
           </ul> : <input
             className="value  flex-grow-1"
-            readOnly={!searchable}
+            readOnly={ !searchable }
             value={
               this.#searchKey ??
               options.find((option) => option.value == value)?.text
@@ -300,41 +303,41 @@ export default class extends uiBase {
             // onFocus={(evt) => {
             //   this.showOptions();
             // }}
-            onInput={(evt) => {
+            onInput={ (evt) => {
               this.#searchKey = evt.target.value;
               this.#activeIndex = false;
               this.updateSelf();
-            }}
-          />}
-          <oi-icon class="expander ms-auto" name="keyboard_arrow_down" onClick={(evt) => {
+            } }
+          /> }
+          <oi-icon class="expander ms-auto" name="keyboard_arrow_down" onClick={ (evt) => {
             this.showOptions();
-          }} />
+          } } />
         </div>
 
         <ul
-          className={classNames("dropdown-menu", {
+          className={ classNames("dropdown-menu", {
             searching: this.#searchKey,
             multiple,
-          })}
+          }) }
           slot="menu"
         >
-          {options.map((option, index) => (
+          { options.map((option, index) => (
             <li
-              data-index={index}
-              className={classNames("option", {
+              data-index={ index }
+              className={ classNames("option", {
                 match: option.text.includes(this.#searchKey),
                 active: multiple
                   ? values.includes(option.value)
                   : value == option.value,
-              })}
-              onClick={(evt) => {
+              }) }
+              onClick={ (evt) => {
                 this.toggleOption(option);
 
-              }}
+              } }
             >
-              {createOption(option, index)}
+              { createOption(option, index) }
             </li>
-          ))}
+          )) }
         </ul>
       </oi-dropdown>
     );

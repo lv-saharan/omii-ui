@@ -1,7 +1,7 @@
 {
   "name": "omii-ui",
-  "version": "1.0.32",
-  "description": "omi 兼容的ui库，样式采用bootstrap。可以作为标准的esmodule使用",
+  "version": "1.1.0",
+  "description": "使用OMII开发的WebComponents库，样式采用bootstrap。可以作为标准的esmodule使用",
   "main": "src/index.jsx",
   "type": "module",
   "localDev": {
@@ -31,15 +31,15 @@
     "npm-run-all": "^4.1.5"
   },
   "dependencies": {
-    "@floating-ui/dom": "^1.0.1",
-    "@material-design-icons/svg": "^0.11.5",
-    "bootstrap": "^5.2.0",
-    "bootstrap-icons": "^1.9.1",
-    "echarts": "^5.4.0",
-    "monaco-editor": "^0.34.0",
+    "@floating-ui/dom": "^1.0.12",
+    "@material-design-icons/svg": "^0.11.9",
+    "bootstrap": "^5.2.3",
+    "bootstrap-icons": "^1.10.2",
+    "echarts": "^5.4.1",
+    "monaco-editor": "^0.34.1",
     "preview-utils": "^1.0.1",
     "sortablejs": "^1.15.0",
-    "tinymce": "^6.3.0"
+    "tinymce": "^6.3.1"
   },
   "repository": {
     "type": "git",

@@ -8,6 +8,13 @@ import css from "./index.scss";
  */
 export default class extends uiBase {
   static css = css;
+  static propTypes = {
+    pageNum: Number,
+    pageCount: Number,
+    pageSize: Number,
+    total: Number,
+    showMore: Boolean,
+  };
   static defaultProps = {
     pageNum: 1,
     pageCount: 10,
@@ -157,13 +164,7 @@ export default class extends uiBase {
       );
     },
   };
-  static propTypes = {
-    pageNum: Number,
-    pageCount: Number,
-    pageSize: Number,
-    total: Number,
-    showMore: Boolean,
-  };
+
   get currPageNum() {
     return this.$props.pageNum;
   }
@@ -182,11 +183,13 @@ export default class extends uiBase {
     if (pageNum >= 1 || pageNum < pageCount) {
       this.update$Props({
         pageNum,
+      }).then(() => {
+        this.fire("paged", pageNum);
       });
-      this.fire("paged", pageNum);
     }
   }
 
+  
   render(settings) {
     return settings.createLayout(settings, this);
   }

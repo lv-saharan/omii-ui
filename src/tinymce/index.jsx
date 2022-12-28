@@ -213,6 +213,7 @@ export default class extends uiBase {
       maxWidth,
       maxHeight,
       resize,
+      placeholder
     } = this.$props;
     tinymce.init({
       target: $editor,
@@ -265,6 +266,7 @@ export default class extends uiBase {
       max_width: maxWidth,
       max_height: maxHeight,
       resize,
+      placeholder,
       setup: (editor) => {
         this.#editor = editor;
         this.fire("setup", { editor })

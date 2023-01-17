@@ -271,7 +271,6 @@ export default class extends uiBase {
             this.showOptions();
           }}
         >
-          {" "}
           {multiple ? (
             <ul class="values d-flex flex-wrap">
               {values.map((value, index) => {
@@ -298,7 +297,7 @@ export default class extends uiBase {
             </ul>
           ) : (
             <input
-              className="value  flex-grow-1"
+              className="value w-100"
               readOnly={!searchable}
               value={
                 this.#searchKey ??

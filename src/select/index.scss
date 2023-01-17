@@ -3,9 +3,12 @@
 
     .selected {
         &.focus {
-            input.value {
-                width: 5em !important;
+            .values {
+                input.value {
+                    width: 5em !important;
+                }
             }
+
         }
 
         width: 100%;
@@ -23,30 +26,30 @@
         oi-bi {
             vertical-align: initial;
         }
-    }
 
 
-    .values {
-        margin: 0;
-        padding: 0;
+        .values {
+            margin: 0;
+            padding: 0;
 
-        li {
-            list-style: none;
-            margin-bottom: .1em;
-            padding: 0.1rem .5rem;
-        }
+            li {
+                list-style: none;
+                margin-bottom: .1em;
+                padding: 0.1rem .5rem;
+            }
 
-        input.value {
-            width: 0;
-        }
+            input.value {
+                width: 0;
+            }
 
 
-        li:not(.input) {
-            background-color: aliceblue;
-            margin-right: .25em;
+            li:not(.input) {
+                background-color: aliceblue;
+                margin-right: .25em;
 
-            border-radius: .5;
+                border-radius: .5;
 
+            }
         }
     }
 

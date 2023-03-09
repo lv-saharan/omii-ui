@@ -24,6 +24,7 @@
       this.unexpectedErrorHandler(e);
       this.emit(e);
     }
+    // For external errors, we don't want the listeners to be called
     onUnexpectedExternalError(e) {
       this.unexpectedErrorHandler(e);
     }
@@ -346,6 +347,11 @@
       this._isDisposed = false;
       trackDisposable(this);
     }
+    /**
+     * Dispose of all registered disposables and mark this object as disposed.
+     *
+     * Any future disposables added to this object will be disposed of on `add`.
+     */
     dispose() {
       if (this._isDisposed) {
         return;
@@ -354,9 +360,15 @@
       this._isDisposed = true;
       this.clear();
     }
+    /**
+     * Returns `true` if this object has been disposed
+     */
     get isDisposed() {
       return this._isDisposed;
     }
+    /**
+     * Dispose of all registered disposables but do not mark this object as disposed.
+     */
     clear() {
       try {
         dispose(this._toDispose.values());
@@ -597,7 +609,13 @@
     _isIOS = (_userAgent.indexOf("Macintosh") >= 0 || _userAgent.indexOf("iPad") >= 0 || _userAgent.indexOf("iPhone") >= 0) && !!navigator.maxTouchPoints && navigator.maxTouchPoints > 0;
     _isLinux = _userAgent.indexOf("Linux") >= 0;
     _isWeb = true;
-    const configuredLocale = getConfiguredDefaultLocale(localize({ key: "ensureLoaderPluginIsLoaded", comment: ["{Locked}"] }, "_"));
+    const configuredLocale = getConfiguredDefaultLocale(
+      // This call _must_ be done in the file that calls `nls.getConfiguredDefaultLocale`
+      // to ensure that the NLS AMD Loader plugin has been loaded and configured.
+      // This is because the loader plugin decides what the default locale is based on
+      // how it's able to resolve the strings.
+      localize({ key: "ensureLoaderPluginIsLoaded", comment: ["{Locked}"] }, "_")
+    );
     _locale = configuredLocale || LANGUAGE_DEFAULT;
     _language = _locale;
   } else if (typeof nodeProcess === "object") {
@@ -1121,6 +1139,10 @@
         (_d = this._leakageMon) === null || _d === void 0 ? void 0 : _d.dispose();
       }
     }
+    /**
+     * For the public to allow to subscribe
+     * to events from this Emitter
+     */
     get event() {
       if (!this._event) {
         this._event = (callback, thisArgs, disposables) => {
@@ -1171,6 +1193,10 @@
       }
       return this._event;
     }
+    /**
+     * To be kept private to fire an event to
+     * subscribers
+     */
     fire(event) {
       var _a4, _b;
       if (this._listeners) {
@@ -1288,9 +1314,18 @@
       this.executor = executor;
       this._didRun = false;
     }
+    /**
+     * True if the lazy value has been resolved.
+     */
     hasValue() {
       return this._didRun;
     }
+    /**
+     * Get the wrapped value.
+     *
+     * This will force evaluation of the lazy value if it has not been resolved yet. Lazy values are only
+     * resolved once. `getValue` will re-throw exceptions that are hit while resolving the value
+     */
     getValue() {
       if (!this._didRun) {
         try {
@@ -1306,6 +1341,9 @@
       }
       return this._value;
     }
+    /**
+     * Get the wrapped value without forcing evaluation.
+     */
     get rawValue() {
       return this._value;
     }
@@ -1363,7 +1401,10 @@
   function isBasicASCII(str) {
     return IS_BASIC_ASCII.test(str);
   }
-  var UTF8_BOM_CHARACTER = String.fromCharCode(65279);
+  var UTF8_BOM_CHARACTER = String.fromCharCode(
+    65279
+    /* CharCode.UTF8_BOM */
+  );
   var GraphemeBreakTree = class {
     constructor() {
       this._data = getGraphemeBreakRawData();
@@ -1419,6 +1460,10 @@
     isAmbiguous(codePoint) {
       return this.confusableDictionary.has(codePoint);
     }
+    /**
+     * Returns the non basic ASCII code point that the given code point can be confused,
+     * or undefined if such code point does note exist.
+     */
     getPrimaryConfusable(codePoint) {
       return this.confusableDictionary.get(codePoint);
     }
@@ -1790,15 +1835,25 @@
 
   // node_modules/monaco-editor/esm/vs/base/common/diff/diffChange.js
   var DiffChange = class {
+    /**
+     * Constructs a new DiffChange with the given sequence information
+     * and content.
+     */
     constructor(originalStart, originalLength, modifiedStart, modifiedLength) {
       this.originalStart = originalStart;
       this.originalLength = originalLength;
       this.modifiedStart = modifiedStart;
       this.modifiedLength = modifiedLength;
     }
+    /**
+     * The end point (exclusive) of the change in the original sequence.
+     */
     getOriginalEnd() {
       return this.originalStart + this.originalLength;
     }
+    /**
+     * The end point (exclusive) of the change in the modified sequence.
+     */
     getModifiedEnd() {
       return this.modifiedStart + this.modifiedLength;
     }
@@ -1844,7 +1899,10 @@
       this._h2 = 2562383102;
       this._h3 = 271733878;
       this._h4 = 3285377520;
-      this._buff = new Uint8Array(64 + 3);
+      this._buff = new Uint8Array(
+        64 + 3
+        /* to fit any utf-8 */
+      );
       this._buffDV = new DataView(this._buff.buffer);
       this._buffLen = 0;
       this._totalLen = 0;
@@ -1929,7 +1987,12 @@
         this._finished = true;
         if (this._leftoverHighSurrogate) {
           this._leftoverHighSurrogate = 0;
-          this._buffLen = this._push(this._buff, this._buffLen, 65533);
+          this._buffLen = this._push(
+            this._buff,
+            this._buffLen,
+            65533
+            /* SHA1Constant.UNICODE_REPLACEMENT */
+          );
         }
         this._totalLen += this._buffLen;
         this._wrapUp();
@@ -2019,6 +2082,21 @@
     }
   };
   var MyArray = class {
+    /**
+     * Copies a range of elements from an Array starting at the specified source index and pastes
+     * them to another Array starting at the specified destination index. The length and the indexes
+     * are specified as 64-bit integers.
+     * sourceArray:
+     *		The Array that contains the data to copy.
+     * sourceIndex:
+     *		A 64-bit integer that represents the index in the sourceArray at which copying begins.
+     * destinationArray:
+     *		The Array that receives the data.
+     * destinationIndex:
+     *		A 64-bit integer that represents the index in the destinationArray at which storing begins.
+     * length:
+     *		A 64-bit integer that represents the number of elements to copy.
+     */
     static Copy(sourceArray, sourceIndex, destinationArray, destinationIndex, length) {
       for (let i = 0; i < length; i++) {
         destinationArray[destinationIndex + i] = sourceArray[sourceIndex + i];
@@ -2031,6 +2109,9 @@
     }
   };
   var DiffChangeHelper = class {
+    /**
+     * Constructs a new DiffChangeHelper for the given DiffSequences.
+     */
     constructor() {
       this.m_changes = [];
       this.m_originalStart = 1073741824;
@@ -2038,6 +2119,9 @@
       this.m_originalCount = 0;
       this.m_modifiedCount = 0;
     }
+    /**
+     * Marks the beginning of the next change in the set of differences.
+     */
     MarkNextChange() {
       if (this.m_originalCount > 0 || this.m_modifiedCount > 0) {
         this.m_changes.push(new DiffChange(this.m_originalStart, this.m_originalCount, this.m_modifiedStart, this.m_modifiedCount));
@@ -2047,22 +2131,42 @@
       this.m_originalStart = 1073741824;
       this.m_modifiedStart = 1073741824;
     }
+    /**
+     * Adds the original element at the given position to the elements
+     * affected by the current change. The modified index gives context
+     * to the change position with respect to the original sequence.
+     * @param originalIndex The index of the original element to add.
+     * @param modifiedIndex The index of the modified element that provides corresponding position in the modified sequence.
+     */
     AddOriginalElement(originalIndex, modifiedIndex) {
       this.m_originalStart = Math.min(this.m_originalStart, originalIndex);
       this.m_modifiedStart = Math.min(this.m_modifiedStart, modifiedIndex);
       this.m_originalCount++;
     }
+    /**
+     * Adds the modified element at the given position to the elements
+     * affected by the current change. The original index gives context
+     * to the change position with respect to the modified sequence.
+     * @param originalIndex The index of the original element that provides corresponding position in the original sequence.
+     * @param modifiedIndex The index of the modified element to add.
+     */
     AddModifiedElement(originalIndex, modifiedIndex) {
       this.m_originalStart = Math.min(this.m_originalStart, originalIndex);
       this.m_modifiedStart = Math.min(this.m_modifiedStart, modifiedIndex);
       this.m_modifiedCount++;
     }
+    /**
+     * Retrieves all of the changes marked by the class.
+     */
     getChanges() {
       if (this.m_originalCount > 0 || this.m_modifiedCount > 0) {
         this.MarkNextChange();
       }
       return this.m_changes;
     }
+    /**
+     * Retrieves all of the changes marked by the class in the reverse order
+     */
     getReverseChanges() {
       if (this.m_originalCount > 0 || this.m_modifiedCount > 0) {
         this.MarkNextChange();
@@ -2072,6 +2176,9 @@
     }
   };
   var LcsDiff = class {
+    /**
+     * Constructs the DiffFinder
+     */
     constructor(originalSequence, modifiedSequence, continueProcessingPredicate = null) {
       this.ContinueProcessingPredicate = continueProcessingPredicate;
       this._originalSequence = originalSequence;
@@ -2138,6 +2245,11 @@
     ComputeDiff(pretty) {
       return this._ComputeDiff(0, this._originalElementsOrHash.length - 1, 0, this._modifiedElementsOrHash.length - 1, pretty);
     }
+    /**
+     * Computes the differences between the original and modified input
+     * sequences on the bounded range.
+     * @returns An array of the differences between the two input sequences.
+     */
     _ComputeDiff(originalStart, originalEnd, modifiedStart, modifiedEnd, pretty) {
       const quitEarlyArr = [false];
       let changes = this.ComputeDiffRecursive(originalStart, originalEnd, modifiedStart, modifiedEnd, quitEarlyArr);
@@ -2149,6 +2261,11 @@
         changes
       };
     }
+    /**
+     * Private helper method which computes the differences on the bounded range
+     * recursively.
+     * @returns An array of the differences between the two input sequences.
+     */
     ComputeDiffRecursive(originalStart, originalEnd, modifiedStart, modifiedEnd, quitEarlyArr) {
       quitEarlyArr[0] = false;
       while (originalStart <= originalEnd && modifiedStart <= modifiedEnd && this.ElementsAreEqual(originalStart, modifiedStart)) {
@@ -2289,6 +2406,22 @@
       }
       return this.ConcatenateChanges(forwardChanges, reverseChanges);
     }
+    /**
+     * Given the range to compute the diff on, this method finds the point:
+     * (midOriginal, midModified)
+     * that exists in the middle of the LCS of the two sequences and
+     * is the point at which the LCS problem may be broken down recursively.
+     * This method will try to keep the LCS trace in memory. If the LCS recursion
+     * point is calculated and the full trace is available in memory, then this method
+     * will return the change list.
+     * @param originalStart The start bound of the original sequence range
+     * @param originalEnd The end bound of the original sequence range
+     * @param modifiedStart The start bound of the modified sequence range
+     * @param modifiedEnd The end bound of the modified sequence range
+     * @param midOriginal The middle point of the original sequence range
+     * @param midModified The middle point of the modified sequence range
+     * @returns The diff changes, if available, otherwise null
+     */
     ComputeRecursionPoint(originalStart, originalEnd, modifiedStart, modifiedEnd, midOriginalArr, midModifiedArr, quitEarlyArr) {
       let originalIndex = 0, modifiedIndex = 0;
       let diagonalForwardStart = 0, diagonalForwardEnd = 0;
@@ -2401,6 +2534,14 @@
       }
       return this.WALKTRACE(diagonalForwardBase, diagonalForwardStart, diagonalForwardEnd, diagonalForwardOffset, diagonalReverseBase, diagonalReverseStart, diagonalReverseEnd, diagonalReverseOffset, forwardPoints, reversePoints, originalIndex, originalEnd, midOriginalArr, modifiedIndex, modifiedEnd, midModifiedArr, deltaIsEven, quitEarlyArr);
     }
+    /**
+     * Shifts the given changes to provide a more intuitive diff.
+     * While the first element in a diff matches the first element after the diff,
+     * we shift the diff down.
+     *
+     * @param changes The list of changes to shift
+     * @returns The shifted changes
+     */
     PrettifyChanges(changes) {
       for (let i = 0; i < changes.length; i++) {
         const change = changes[i];
@@ -2571,6 +2712,13 @@
       const modifiedScore = this._ModifiedRegionIsBoundary(modifiedStart, modifiedLength) ? 1 : 0;
       return originalScore + modifiedScore;
     }
+    /**
+     * Concatenates the two input DiffChange lists and returns the resulting
+     * list.
+     * @param The left changes
+     * @param The right changes
+     * @returns The concatenated list
+     */
     ConcatenateChanges(left, right) {
       const mergedChangeArr = [];
       if (left.length === 0 || right.length === 0) {
@@ -2588,6 +2736,14 @@
         return result;
       }
     }
+    /**
+     * Returns true if the two changes overlap and can be merged into a single
+     * change
+     * @param left The left change
+     * @param right The right change
+     * @param mergedChange The merged change if the two overlap, null otherwise
+     * @returns True if the two changes overlap
+     */
     ChangesOverlap(left, right, mergedChangeArr) {
       Debug.Assert(left.originalStart <= right.originalStart, "Left change is not less than or equal to right change");
       Debug.Assert(left.modifiedStart <= right.modifiedStart, "Left change is not less than or equal to right change");
@@ -2609,6 +2765,18 @@
         return false;
       }
     }
+    /**
+     * Helper method used to clip a diagonal index to the range of valid
+     * diagonals. This also decides whether or not the diagonal index,
+     * if it exceeds the boundary, should be clipped to the boundary or clipped
+     * one inside the boundary depending on the Even/Odd status of the boundary
+     * and numDifferences.
+     * @param diagonal The index of the diagonal to clip.
+     * @param numDifferences The current number of differences being iterated upon.
+     * @param diagonalBaseIndex The base reference diagonal.
+     * @param numDiagonals The total number of diagonals.
+     * @returns The clipped diagonal index.
+     */
     ClipDiagonalBound(diagonal, numDifferences, diagonalBaseIndex, numDiagonals) {
       if (diagonal >= 0 && diagonal < numDiagonals) {
         return diagonal;
@@ -2661,12 +2829,14 @@
     };
   } else {
     safeProcess = {
+      // Supported
       get platform() {
         return isWindows ? "win32" : isMacintosh ? "darwin" : "linux";
       },
       get arch() {
         return void 0;
       },
+      // Unsupported
       get env() {
         return {};
       },
@@ -2791,6 +2961,7 @@
     return dir === pathObject.root ? `${dir}${base}` : `${dir}${sep2}${base}`;
   }
   var win32 = {
+    // path.resolve([from ...], to)
     resolve(...pathSegments) {
       let resolvedDevice = "";
       let resolvedTail = "";
@@ -2952,7 +3123,8 @@
         return false;
       }
       const code = path.charCodeAt(0);
-      return isPathSeparator(code) || len > 2 && isWindowsDeviceRoot(code) && path.charCodeAt(1) === CHAR_COLON && isPathSeparator(path.charCodeAt(2));
+      return isPathSeparator(code) || // Possible device root
+      len > 2 && isWindowsDeviceRoot(code) && path.charCodeAt(1) === CHAR_COLON && isPathSeparator(path.charCodeAt(2));
     },
     join(...paths) {
       if (paths.length === 0) {
@@ -3000,6 +3172,10 @@
       }
       return win32.normalize(joined);
     },
+    // It will solve the relative path from `from` to `to`, for instance:
+    //  from = 'C:\\orandea\\test\\aaa'
+    //  to = 'C:\\orandea\\impl\\bbb'
+    // The output of the function should be: '..\\..\\impl\\bbb'
     relative(from, to) {
       validateString(from, "from");
       validateString(to, "to");
@@ -3269,7 +3445,9 @@
           preDotState = -1;
         }
       }
-      if (startDot === -1 || end === -1 || preDotState === 0 || preDotState === 1 && startDot === end - 1 && startDot === startPart + 1) {
+      if (startDot === -1 || end === -1 || // We saw a non-dot character immediately before the dot
+      preDotState === 0 || // The (right-most) trimmed path component is exactly '..'
+      preDotState === 1 && startDot === end - 1 && startDot === startPart + 1) {
         return "";
       }
       return path.slice(startDot, end);
@@ -3365,7 +3543,9 @@
         }
       }
       if (end !== -1) {
-        if (startDot === -1 || preDotState === 0 || preDotState === 1 && startDot === end - 1 && startDot === startPart + 1) {
+        if (startDot === -1 || // We saw a non-dot character immediately before the dot
+        preDotState === 0 || // The (right-most) trimmed path component is exactly '..'
+        preDotState === 1 && startDot === end - 1 && startDot === startPart + 1) {
           ret.base = ret.name = path.slice(startPart, end);
         } else {
           ret.name = path.slice(startPart, startDot);
@@ -3386,6 +3566,7 @@
     posix: null
   };
   var posix = {
+    // path.resolve([from ...], to)
     resolve(...pathSegments) {
       let resolvedPath = "";
       let resolvedAbsolute = false;
@@ -3620,7 +3801,9 @@
           preDotState = -1;
         }
       }
-      if (startDot === -1 || end === -1 || preDotState === 0 || preDotState === 1 && startDot === end - 1 && startDot === startPart + 1) {
+      if (startDot === -1 || end === -1 || // We saw a non-dot character immediately before the dot
+      preDotState === 0 || // The (right-most) trimmed path component is exactly '..'
+      preDotState === 1 && startDot === end - 1 && startDot === startPart + 1) {
         return "";
       }
       return path.slice(startDot, end);
@@ -3671,7 +3854,9 @@
       }
       if (end !== -1) {
         const start2 = startPart === 0 && isAbsolute ? 1 : startPart;
-        if (startDot === -1 || preDotState === 0 || preDotState === 1 && startDot === end - 1 && startDot === startPart + 1) {
+        if (startDot === -1 || // We saw a non-dot character immediately before the dot
+        preDotState === 0 || // The (right-most) trimmed path component is exactly '..'
+        preDotState === 1 && startDot === end - 1 && startDot === startPart + 1) {
           ret.base = ret.name = path.slice(start2, end);
         } else {
           ret.name = path.slice(start2, startDot);
@@ -3748,6 +3933,9 @@
   var _slash = "/";
   var _regexp = /^(([^:/?#]+?):)?(\/\/([^/?#]*))?([^?#]*)(\?([^#]*))?(#(.*))?/;
   var URI = class {
+    /**
+     * @internal
+     */
     constructor(schemeOrData, authority, path, query, fragment, _strict = false) {
       if (typeof schemeOrData === "object") {
         this.scheme = schemeOrData.scheme || _empty;
@@ -3773,9 +3961,35 @@
       }
       return typeof thing.authority === "string" && typeof thing.fragment === "string" && typeof thing.path === "string" && typeof thing.query === "string" && typeof thing.scheme === "string" && typeof thing.fsPath === "string" && typeof thing.with === "function" && typeof thing.toString === "function";
     }
+    // ---- filesystem path -----------------------
+    /**
+     * Returns a string representing the corresponding file system path of this URI.
+     * Will handle UNC paths, normalizes windows drive letters to lower-case, and uses the
+     * platform specific path separator.
+     *
+     * * Will *not* validate the path for invalid characters and semantics.
+     * * Will *not* look at the scheme of this URI.
+     * * The result shall *not* be used for display purposes but for accessing a file on disk.
+     *
+     *
+     * The *difference* to `URI#path` is the use of the platform specific separator and the handling
+     * of UNC paths. See the below sample of a file-uri with an authority (UNC path).
+     *
+     * ```ts
+        const u = URI.parse('file://server/c$/folder/file.txt')
+        u.authority === 'server'
+        u.path === '/shares/c$/file.txt'
+        u.fsPath === '\\server\c$\folder\file.txt'
+    ```
+     *
+     * Using `URI#path` to read a file (using fs-apis) would not be enough because parts of the path,
+     * namely the server name, would be missing. Therefore `URI#fsPath` exists - it's sugar to ease working
+     * with URIs that represent files on disk (`file` scheme).
+     */
     get fsPath() {
       return uriToFsPath(this, false);
     }
+    // ---- modify to new -------------------------
     with(change) {
       if (!change) {
         return this;
@@ -3811,6 +4025,13 @@
       }
       return new Uri(scheme, authority, path, query, fragment);
     }
+    // ---- parse & validate ------------------------
+    /**
+     * Creates a new URI from a string, e.g. `http://www.example.com/some/path`,
+     * `file:///usr/home`, or `scheme:with/path`.
+     *
+     * @param value A string which represents an URI (see `URI#toString`).
+     */
     static parse(value, _strict = false) {
       const match = _regexp.exec(value);
       if (!match) {
@@ -3818,6 +4039,27 @@
       }
       return new Uri(match[2] || _empty, percentDecode(match[4] || _empty), percentDecode(match[5] || _empty), percentDecode(match[7] || _empty), percentDecode(match[9] || _empty), _strict);
     }
+    /**
+     * Creates a new URI from a file system path, e.g. `c:\my\files`,
+     * `/usr/home`, or `\\server\share\some\path`.
+     *
+     * The *difference* between `URI#parse` and `URI#file` is that the latter treats the argument
+     * as path, not as stringified-uri. E.g. `URI.file(path)` is **not the same as**
+     * `URI.parse('file://' + path)` because the path might contain characters that are
+     * interpreted (# and ?). See the following sample:
+     * ```ts
+    const good = URI.file('/coding/c#/project1');
+    good.scheme === 'file';
+    good.path === '/coding/c#/project1';
+    good.fragment === '';
+    const bad = URI.parse('file://' + '/coding/c#/project1');
+    bad.scheme === 'file';
+    bad.path === '/coding/c'; // path is now broken
+    bad.fragment === '/project1';
+    ```
+     *
+     * @param path A file system path (see `URI#fsPath`)
+     */
     static file(path) {
       let authority = _empty;
       if (isWindows) {
@@ -3840,6 +4082,13 @@
       _validateUri(result, true);
       return result;
     }
+    /**
+     * Join a URI path with path fragments and normalizes the resulting path.
+     *
+     * @param uri The input URI.
+     * @param pathFragment The path fragment to add to the URI path.
+     * @returns The resulting URI.
+     */
     static joinPath(uri, ...pathFragment) {
       if (!uri.path) {
         throw new Error(`[UriError]: cannot call joinPath on URI without path`);
@@ -3852,6 +4101,18 @@
       }
       return uri.with({ path: newPath });
     }
+    // ---- printing/externalize ---------------------------
+    /**
+     * Creates a string representation for this URI. It's guaranteed that calling
+     * `URI.parse` with the result of this function creates an URI which is equal
+     * to this URI.
+     *
+     * * The result shall *not* be used for display purposes but for externalization or transport.
+     * * The result will be encoded using the percentage encoding and encoding happens mostly
+     * ignore the scheme-specific encoding rules.
+     *
+     * @param skipEncoding Do not encode the result, default is `false`
+     */
     toString(skipEncoding = false) {
       return _asFormatted(this, skipEncoding);
     }
@@ -3897,6 +4158,7 @@
     toJSON() {
       const res = {
         $mid: 1
+        /* MarshalledId.Uri */
       };
       if (this._fsPath) {
         res.fsPath = this._fsPath;
@@ -3924,25 +4186,82 @@
     }
   };
   var encodeTable = {
-    [58]: "%3A",
-    [47]: "%2F",
-    [63]: "%3F",
-    [35]: "%23",
-    [91]: "%5B",
-    [93]: "%5D",
-    [64]: "%40",
-    [33]: "%21",
-    [36]: "%24",
-    [38]: "%26",
-    [39]: "%27",
-    [40]: "%28",
-    [41]: "%29",
-    [42]: "%2A",
-    [43]: "%2B",
-    [44]: "%2C",
-    [59]: "%3B",
-    [61]: "%3D",
-    [32]: "%20"
+    [
+      58
+      /* CharCode.Colon */
+    ]: "%3A",
+    [
+      47
+      /* CharCode.Slash */
+    ]: "%2F",
+    [
+      63
+      /* CharCode.QuestionMark */
+    ]: "%3F",
+    [
+      35
+      /* CharCode.Hash */
+    ]: "%23",
+    [
+      91
+      /* CharCode.OpenSquareBracket */
+    ]: "%5B",
+    [
+      93
+      /* CharCode.CloseSquareBracket */
+    ]: "%5D",
+    [
+      64
+      /* CharCode.AtSign */
+    ]: "%40",
+    [
+      33
+      /* CharCode.ExclamationMark */
+    ]: "%21",
+    [
+      36
+      /* CharCode.DollarSign */
+    ]: "%24",
+    [
+      38
+      /* CharCode.Ampersand */
+    ]: "%26",
+    [
+      39
+      /* CharCode.SingleQuote */
+    ]: "%27",
+    [
+      40
+      /* CharCode.OpenParen */
+    ]: "%28",
+    [
+      41
+      /* CharCode.CloseParen */
+    ]: "%29",
+    [
+      42
+      /* CharCode.Asterisk */
+    ]: "%2A",
+    [
+      43
+      /* CharCode.Plus */
+    ]: "%2B",
+    [
+      44
+      /* CharCode.Comma */
+    ]: "%2C",
+    [
+      59
+      /* CharCode.Semicolon */
+    ]: "%3B",
+    [
+      61
+      /* CharCode.Equals */
+    ]: "%3D",
+    [
+      32
+      /* CharCode.Space */
+    ]: "%20"
   };
   function encodeURIComponentFast(uriComponent, allowSlash) {
     let res = void 0;
@@ -4098,6 +4417,12 @@
       this.lineNumber = lineNumber;
       this.column = column;
     }
+    /**
+     * Create a new position from this position.
+     *
+     * @param newLineNumber new line number
+     * @param newColumn new column
+     */
     with(newLineNumber = this.lineNumber, newColumn = this.column) {
       if (newLineNumber === this.lineNumber && newColumn === this.column) {
         return this;
@@ -4105,21 +4430,41 @@
         return new Position(newLineNumber, newColumn);
       }
     }
+    /**
+     * Derive a new position from this position.
+     *
+     * @param deltaLineNumber line number delta
+     * @param deltaColumn column delta
+     */
     delta(deltaLineNumber = 0, deltaColumn = 0) {
       return this.with(this.lineNumber + deltaLineNumber, this.column + deltaColumn);
     }
+    /**
+     * Test if this position equals other position
+     */
     equals(other) {
       return Position.equals(this, other);
     }
+    /**
+     * Test if position `a` equals position `b`
+     */
     static equals(a, b) {
       if (!a && !b) {
         return true;
       }
       return !!a && !!b && a.lineNumber === b.lineNumber && a.column === b.column;
     }
+    /**
+     * Test if this position is before other position.
+     * If the two positions are equal, the result will be false.
+     */
     isBefore(other) {
       return Position.isBefore(this, other);
     }
+    /**
+     * Test if position `a` is before position `b`.
+     * If the two positions are equal, the result will be false.
+     */
     static isBefore(a, b) {
       if (a.lineNumber < b.lineNumber) {
         return true;
@@ -4129,9 +4474,17 @@
       }
       return a.column < b.column;
     }
+    /**
+     * Test if this position is before other position.
+     * If the two positions are equal, the result will be true.
+     */
     isBeforeOrEqual(other) {
       return Position.isBeforeOrEqual(this, other);
     }
+    /**
+     * Test if position `a` is before position `b`.
+     * If the two positions are equal, the result will be true.
+     */
     static isBeforeOrEqual(a, b) {
       if (a.lineNumber < b.lineNumber) {
         return true;
@@ -4141,6 +4494,9 @@
       }
       return a.column <= b.column;
     }
+    /**
+     * A function that compares positions, useful for sorting
+     */
     static compare(a, b) {
       const aLineNumber = a.lineNumber | 0;
       const bLineNumber = b.lineNumber | 0;
@@ -4151,15 +4507,28 @@
       }
       return aLineNumber - bLineNumber;
     }
+    /**
+     * Clone this position.
+     */
     clone() {
       return new Position(this.lineNumber, this.column);
     }
+    /**
+     * Convert to a human-readable representation.
+     */
     toString() {
       return "(" + this.lineNumber + "," + this.column + ")";
     }
+    // ---
+    /**
+     * Create a `Position` from an `IPosition`.
+     */
     static lift(pos) {
       return new Position(pos.lineNumber, pos.column);
     }
+    /**
+     * Test if `obj` is an `IPosition`.
+     */
     static isIPosition(obj) {
       return obj && typeof obj.lineNumber === "number" && typeof obj.column === "number";
     }
@@ -4180,15 +4549,27 @@
         this.endColumn = endColumn;
       }
     }
+    /**
+     * Test if this range is empty.
+     */
     isEmpty() {
       return Range.isEmpty(this);
     }
+    /**
+     * Test if `range` is empty.
+     */
     static isEmpty(range) {
       return range.startLineNumber === range.endLineNumber && range.startColumn === range.endColumn;
     }
+    /**
+     * Test if position is in this range. If the position is at the edges, will return true.
+     */
     containsPosition(position) {
       return Range.containsPosition(this, position);
     }
+    /**
+     * Test if `position` is in `range`. If the position is at the edges, will return true.
+     */
     static containsPosition(range, position) {
       if (position.lineNumber < range.startLineNumber || position.lineNumber > range.endLineNumber) {
         return false;
@@ -4201,6 +4582,10 @@
       }
       return true;
     }
+    /**
+     * Test if `position` is in `range`. If the position is at the edges, will return false.
+     * @internal
+     */
     static strictContainsPosition(range, position) {
       if (position.lineNumber < range.startLineNumber || position.lineNumber > range.endLineNumber) {
         return false;
@@ -4213,9 +4598,15 @@
       }
       return true;
     }
+    /**
+     * Test if range is in this range. If the range is equal to this range, will return true.
+     */
     containsRange(range) {
       return Range.containsRange(this, range);
     }
+    /**
+     * Test if `otherRange` is in `range`. If the ranges are equal, will return true.
+     */
     static containsRange(range, otherRange) {
       if (otherRange.startLineNumber < range.startLineNumber || otherRange.endLineNumber < range.startLineNumber) {
         return false;
@@ -4231,9 +4622,15 @@
       }
       return true;
     }
+    /**
+     * Test if `range` is strictly in this range. `range` must start after and end before this range for the result to be true.
+     */
     strictContainsRange(range) {
       return Range.strictContainsRange(this, range);
     }
+    /**
+     * Test if `otherRange` is strictly in `range` (must start after, and end before). If the ranges are equal, will return false.
+     */
     static strictContainsRange(range, otherRange) {
       if (otherRange.startLineNumber < range.startLineNumber || otherRange.endLineNumber < range.startLineNumber) {
         return false;
@@ -4249,9 +4646,17 @@
       }
       return true;
     }
+    /**
+     * A reunion of the two ranges.
+     * The smallest position will be used as the start point, and the largest one as the end point.
+     */
     plusRange(range) {
       return Range.plusRange(this, range);
     }
+    /**
+     * A reunion of the two ranges.
+     * The smallest position will be used as the start point, and the largest one as the end point.
+     */
     static plusRange(a, b) {
       let startLineNumber;
       let startColumn;
@@ -4279,9 +4684,15 @@
       }
       return new Range(startLineNumber, startColumn, endLineNumber, endColumn);
     }
+    /**
+     * A intersection of the two ranges.
+     */
     intersectRanges(range) {
       return Range.intersectRanges(this, range);
     }
+    /**
+     * A intersection of the two ranges.
+     */
     static intersectRanges(a, b) {
       let resultStartLineNumber = a.startLineNumber;
       let resultStartColumn = a.startColumn;
@@ -4311,39 +4722,73 @@
       }
       return new Range(resultStartLineNumber, resultStartColumn, resultEndLineNumber, resultEndColumn);
     }
+    /**
+     * Test if this range equals other.
+     */
     equalsRange(other) {
       return Range.equalsRange(this, other);
     }
+    /**
+     * Test if range `a` equals `b`.
+     */
     static equalsRange(a, b) {
       return !!a && !!b && a.startLineNumber === b.startLineNumber && a.startColumn === b.startColumn && a.endLineNumber === b.endLineNumber && a.endColumn === b.endColumn;
     }
+    /**
+     * Return the end position (which will be after or equal to the start position)
+     */
     getEndPosition() {
       return Range.getEndPosition(this);
     }
+    /**
+     * Return the end position (which will be after or equal to the start position)
+     */
     static getEndPosition(range) {
       return new Position(range.endLineNumber, range.endColumn);
     }
+    /**
+     * Return the start position (which will be before or equal to the end position)
+     */
     getStartPosition() {
       return Range.getStartPosition(this);
     }
+    /**
+     * Return the start position (which will be before or equal to the end position)
+     */
     static getStartPosition(range) {
       return new Position(range.startLineNumber, range.startColumn);
     }
+    /**
+     * Transform to a user presentable string representation.
+     */
     toString() {
       return "[" + this.startLineNumber + "," + this.startColumn + " -> " + this.endLineNumber + "," + this.endColumn + "]";
     }
+    /**
+     * Create a new range using this range's start position, and using endLineNumber and endColumn as the end position.
+     */
     setEndPosition(endLineNumber, endColumn) {
       return new Range(this.startLineNumber, this.startColumn, endLineNumber, endColumn);
     }
+    /**
+     * Create a new range using this range's end position, and using startLineNumber and startColumn as the start position.
+     */
     setStartPosition(startLineNumber, startColumn) {
       return new Range(startLineNumber, startColumn, this.endLineNumber, this.endColumn);
     }
+    /**
+     * Create a new empty range using this range's start position.
+     */
     collapseToStart() {
       return Range.collapseToStart(this);
     }
+    /**
+     * Create a new empty range using this range's start position.
+     */
     static collapseToStart(range) {
       return new Range(range.startLineNumber, range.startColumn, range.startLineNumber, range.startColumn);
     }
+    // ---
     static fromPositions(start, end = start) {
       return new Range(start.lineNumber, start.column, end.lineNumber, end.column);
     }
@@ -4353,9 +4798,15 @@
       }
       return new Range(range.startLineNumber, range.startColumn, range.endLineNumber, range.endColumn);
     }
+    /**
+     * Test if `obj` is an `IRange`.
+     */
     static isIRange(obj) {
       return obj && typeof obj.startLineNumber === "number" && typeof obj.startColumn === "number" && typeof obj.endLineNumber === "number" && typeof obj.endColumn === "number";
     }
+    /**
+     * Test if the two ranges are touching in any way.
+     */
     static areIntersectingOrTouching(a, b) {
       if (a.endLineNumber < b.startLineNumber || a.endLineNumber === b.startLineNumber && a.endColumn < b.startColumn) {
         return false;
@@ -4365,6 +4816,9 @@
       }
       return true;
     }
+    /**
+     * Test if the two ranges are intersecting. If the ranges are touching it returns true.
+     */
     static areIntersecting(a, b) {
       if (a.endLineNumber < b.startLineNumber || a.endLineNumber === b.startLineNumber && a.endColumn <= b.startColumn) {
         return false;
@@ -4374,6 +4828,10 @@
       }
       return true;
     }
+    /**
+     * A function that compares ranges, useful for sorting ranges
+     * It will first compare ranges on the startPosition and then on the endPosition
+     */
     static compareRangesUsingStarts(a, b) {
       if (a && b) {
         const aStartLineNumber = a.startLineNumber | 0;
@@ -4399,6 +4857,10 @@
       const bExists = b ? 1 : 0;
       return aExists - bExists;
     }
+    /**
+     * A function that compares ranges, useful for sorting ranges
+     * It will first compare ranges on the endPosition and then on the startPosition
+     */
     static compareRangesUsingEnds(a, b) {
       if (a.endLineNumber === b.endLineNumber) {
         if (a.endColumn === b.endColumn) {
@@ -4411,6 +4873,9 @@
       }
       return a.endLineNumber - b.endLineNumber;
     }
+    /**
+     * Test if the range spans multiple lines.
+     */
     static spansMultipleLines(range) {
       return range.endLineNumber > range.startLineNumber;
     }
@@ -4922,6 +5387,10 @@
       }
       return this._getPrefixSum(this.values.length - 1);
     }
+    /**
+     * Returns the sum of the first `index + 1` many items.
+     * @returns `SUM(0 <= j <= index, values[j])`.
+     */
     getPrefixSum(index) {
       if (index < 0) {
         return 0;
@@ -5026,6 +5495,9 @@
         this._lineStarts = new PrefixSumComputer(lineStartValues);
       }
     }
+    /**
+     * All changes to a line's text go through this method
+     */
     _setLineText(lineIndex, newValue) {
       this._lines[lineIndex] = newValue;
       if (this._lineStarts) {
@@ -5236,7 +5708,12 @@
       }
       maxCharCode++;
       maxState++;
-      const states = new Uint8Matrix(maxState, maxCharCode, 0);
+      const states = new Uint8Matrix(
+        maxState,
+        maxCharCode,
+        0
+        /* State.Invalid */
+      );
       for (let i = 0, len = edges.length; i < len; i++) {
         const [from, chCode, to] = edges[i];
         states.set(from, chCode, to);
@@ -5255,28 +5732,138 @@
   function getStateMachine() {
     if (_stateMachine === null) {
       _stateMachine = new StateMachine([
-        [1, 104, 2],
-        [1, 72, 2],
-        [1, 102, 6],
-        [1, 70, 6],
-        [2, 116, 3],
-        [2, 84, 3],
-        [3, 116, 4],
-        [3, 84, 4],
-        [4, 112, 5],
-        [4, 80, 5],
-        [5, 115, 9],
-        [5, 83, 9],
-        [5, 58, 10],
-        [6, 105, 7],
-        [6, 73, 7],
-        [7, 108, 8],
-        [7, 76, 8],
-        [8, 101, 9],
-        [8, 69, 9],
-        [9, 58, 10],
-        [10, 47, 11],
-        [11, 47, 12]
+        [
+          1,
+          104,
+          2
+          /* State.H */
+        ],
+        [
+          1,
+          72,
+          2
+          /* State.H */
+        ],
+        [
+          1,
+          102,
+          6
+          /* State.F */
+        ],
+        [
+          1,
+          70,
+          6
+          /* State.F */
+        ],
+        [
+          2,
+          116,
+          3
+          /* State.HT */
+        ],
+        [
+          2,
+          84,
+          3
+          /* State.HT */
+        ],
+        [
+          3,
+          116,
+          4
+          /* State.HTT */
+        ],
+        [
+          3,
+          84,
+          4
+          /* State.HTT */
+        ],
+        [
+          4,
+          112,
+          5
+          /* State.HTTP */
+        ],
+        [
+          4,
+          80,
+          5
+          /* State.HTTP */
+        ],
+        [
+          5,
+          115,
+          9
+          /* State.BeforeColon */
+        ],
+        [
+          5,
+          83,
+          9
+          /* State.BeforeColon */
+        ],
+        [
+          5,
+          58,
+          10
+          /* State.AfterColon */
+        ],
+        [
+          6,
+          105,
+          7
+          /* State.FI */
+        ],
+        [
+          6,
+          73,
+          7
+          /* State.FI */
+        ],
+        [
+          7,
+          108,
+          8
+          /* State.FIL */
+        ],
+        [
+          7,
+          76,
+          8
+          /* State.FIL */
+        ],
+        [
+          8,
+          101,
+          9
+          /* State.BeforeColon */
+        ],
+        [
+          8,
+          69,
+          9
+          /* State.BeforeColon */
+        ],
+        [
+          9,
+          58,
+          10
+          /* State.AfterColon */
+        ],
+        [
+          10,
+          47,
+          11
+          /* State.AlmostThere */
+        ],
+        [
+          11,
+          47,
+          12
+          /* State.End */
+        ]
       ]);
     }
     return _stateMachine;
@@ -5284,14 +5871,25 @@
   var _classifier = null;
   function getClassifier() {
     if (_classifier === null) {
-      _classifier = new CharacterClassifier(0);
+      _classifier = new CharacterClassifier(
+        0
+        /* CharacterClass.None */
+      );
       const FORCE_TERMINATION_CHARACTERS = ` 	<>'"\u3001\u3002\uFF61\uFF64\uFF0C\uFF0E\uFF1A\uFF1B\u2018\u3008\u300C\u300E\u3014\uFF08\uFF3B\uFF5B\uFF62\uFF63\uFF5D\uFF3D\uFF09\u3015\u300F\u300D\u3009\u2019\uFF40\uFF5E\u2026`;
       for (let i = 0; i < FORCE_TERMINATION_CHARACTERS.length; i++) {
-        _classifier.set(FORCE_TERMINATION_CHARACTERS.charCodeAt(i), 1);
+        _classifier.set(
+          FORCE_TERMINATION_CHARACTERS.charCodeAt(i),
+          1
+          /* CharacterClass.ForceTermination */
+        );
       }
       const CANNOT_END_WITH_CHARACTERS = ".,;:";
       for (let i = 0; i < CANNOT_END_WITH_CHARACTERS.length; i++) {
-        _classifier.set(CANNOT_END_WITH_CHARACTERS.charCodeAt(i), 2);
+        _classifier.set(
+          CANNOT_END_WITH_CHARACTERS.charCodeAt(i),
+          2
+          /* CharacterClass.CannotEndIn */
+        );
       }
     }
     return _classifier;
@@ -5648,6 +6246,7 @@
   (function() {
     const empty = "";
     const mappings = [
+      // keyCodeOrd, immutable, scanCode, scanCodeStr, keyCode, keyCodeStr, eventKeyCode, vkey, usUserSettingsLabel, generalUserSettingsLabel
       [0, 1, 0, "None", 0, "unknown", 0, "VK_UNKNOWN", empty, empty],
       [0, 1, 1, "Hyper", 0, empty, 0, empty, empty, empty],
       [0, 1, 2, "Super", 0, empty, 0, empty, empty, empty],
@@ -5845,6 +6444,8 @@
       [0, 1, 190, "MailReply", 0, empty, 0, empty, empty, empty],
       [0, 1, 191, "MailForward", 0, empty, 0, empty, empty, empty],
       [0, 1, 192, "MailSend", 0, empty, 0, empty, empty, empty],
+      // See https://lists.w3.org/Archives/Public/www-dom/2010JulSep/att-0182/keyCode-spec.html
+      // If an Input Method Editor is processing key input and the event is keydown, return 229.
       [109, 1, 0, empty, 109, "KeyInComposition", 229, empty, empty, empty],
       [111, 1, 0, empty, 111, "ABNT_C2", 194, "VK_ABNT_C2", empty, empty],
       [91, 1, 0, empty, 91, "OEM_8", 223, "VK_OEM_8", empty, empty],
@@ -5910,7 +6511,10 @@
         NATIVE_WINDOWS_KEY_CODE_TO_KEY_CODE[vkey] = keyCode;
       }
     }
-    IMMUTABLE_KEY_CODE_TO_CODE[3] = 46;
+    IMMUTABLE_KEY_CODE_TO_CODE[
+      3
+      /* KeyCode.Enter */
+    ] = 46;
   })();
   var KeyCodeUtils;
   (function(KeyCodeUtils2) {
@@ -5966,42 +6570,73 @@
       this.positionLineNumber = positionLineNumber;
       this.positionColumn = positionColumn;
     }
+    /**
+     * Transform to a human-readable representation.
+     */
     toString() {
       return "[" + this.selectionStartLineNumber + "," + this.selectionStartColumn + " -> " + this.positionLineNumber + "," + this.positionColumn + "]";
     }
+    /**
+     * Test if equals other selection.
+     */
     equalsSelection(other) {
       return Selection.selectionsEqual(this, other);
     }
+    /**
+     * Test if the two selections are equal.
+     */
     static selectionsEqual(a, b) {
       return a.selectionStartLineNumber === b.selectionStartLineNumber && a.selectionStartColumn === b.selectionStartColumn && a.positionLineNumber === b.positionLineNumber && a.positionColumn === b.positionColumn;
     }
+    /**
+     * Get directions (LTR or RTL).
+     */
     getDirection() {
       if (this.selectionStartLineNumber === this.startLineNumber && this.selectionStartColumn === this.startColumn) {
         return 0;
       }
       return 1;
     }
+    /**
+     * Create a new selection with a different `positionLineNumber` and `positionColumn`.
+     */
     setEndPosition(endLineNumber, endColumn) {
       if (this.getDirection() === 0) {
         return new Selection(this.startLineNumber, this.startColumn, endLineNumber, endColumn);
       }
       return new Selection(endLineNumber, endColumn, this.startLineNumber, this.startColumn);
     }
+    /**
+     * Get the position at `positionLineNumber` and `positionColumn`.
+     */
     getPosition() {
       return new Position(this.positionLineNumber, this.positionColumn);
     }
+    /**
+     * Get the position at the start of the selection.
+    */
     getSelectionStart() {
       return new Position(this.selectionStartLineNumber, this.selectionStartColumn);
     }
+    /**
+     * Create a new selection with a different `selectionStartLineNumber` and `selectionStartColumn`.
+     */
     setStartPosition(startLineNumber, startColumn) {
       if (this.getDirection() === 0) {
         return new Selection(startLineNumber, startColumn, this.endLineNumber, this.endColumn);
       }
       return new Selection(this.endLineNumber, this.endColumn, startLineNumber, startColumn);
     }
+    // ----
+    /**
+     * Create a `Selection` from one or two positions
+     */
     static fromPositions(start, end = start) {
       return new Selection(start.lineNumber, start.column, end.lineNumber, end.column);
     }
+    /**
+     * Creates a `Selection` from a range, given a direction.
+     */
     static fromRange(range, direction) {
       if (direction === 0) {
         return new Selection(range.startLineNumber, range.startColumn, range.endLineNumber, range.endColumn);
@@ -6009,9 +6644,15 @@
         return new Selection(range.endLineNumber, range.endColumn, range.startLineNumber, range.startColumn);
       }
     }
+    /**
+     * Create a `Selection` from an `ISelection`.
+     */
     static liftSelection(sel) {
       return new Selection(sel.selectionStartLineNumber, sel.selectionStartColumn, sel.positionLineNumber, sel.positionColumn);
     }
+    /**
+     * `a` equals `b`.
+     */
     static selectionsArrEqual(a, b) {
       if (a && !b || !a && b) {
         return false;
@@ -6029,9 +6670,15 @@
       }
       return true;
     }
+    /**
+     * Test if `obj` is an `ISelection`.
+     */
     static isISelection(obj) {
       return obj && typeof obj.selectionStartLineNumber === "number" && typeof obj.selectionStartColumn === "number" && typeof obj.positionLineNumber === "number" && typeof obj.positionColumn === "number";
     }
+    /**
+     * Create with a direction.
+     */
     static createWithDirection(startLineNumber, startColumn, endLineNumber, endColumn, direction) {
       if (direction === 0) {
         return new Selection(startLineNumber, startColumn, endLineNumber, endColumn);
@@ -6051,12 +6698,16 @@
     get classNames() {
       return "codicon codicon-" + this.id;
     }
+    // classNamesArray is useful for migrating to ES6 classlist
     get classNamesArray() {
       return ["codicon", "codicon-" + this.id];
     }
     get cssSelector() {
       return ".codicon.codicon-" + this.id;
     }
+    /**
+     * @returns Returns all default icons covered by the codicon font. Only to be used by the icon registry in platform.
+     */
     static getAll() {
       return Codicon._allCodicons;
     }
@@ -6733,7 +7384,10 @@
     }
     getDefaultBackground() {
       if (this._colorMap && this._colorMap.length > 2) {
-        return this._colorMap[2];
+        return this._colorMap[
+          2
+          /* ColorId.DefaultBackground */
+        ];
       }
       return null;
     }
@@ -6828,36 +7482,156 @@
     }
     CompletionItemKinds2.toIcon = toIcon;
     const data = /* @__PURE__ */ new Map();
-    data.set("method", 0);
-    data.set("function", 1);
-    data.set("constructor", 2);
-    data.set("field", 3);
-    data.set("variable", 4);
-    data.set("class", 5);
-    data.set("struct", 6);
-    data.set("interface", 7);
-    data.set("module", 8);
-    data.set("property", 9);
-    data.set("event", 10);
-    data.set("operator", 11);
-    data.set("unit", 12);
-    data.set("value", 13);
-    data.set("constant", 14);
-    data.set("enum", 15);
-    data.set("enum-member", 16);
-    data.set("enumMember", 16);
-    data.set("keyword", 17);
-    data.set("snippet", 27);
-    data.set("text", 18);
-    data.set("color", 19);
-    data.set("file", 20);
-    data.set("reference", 21);
-    data.set("customcolor", 22);
-    data.set("folder", 23);
-    data.set("type-parameter", 24);
-    data.set("typeParameter", 24);
-    data.set("account", 25);
-    data.set("issue", 26);
+    data.set(
+      "method",
+      0
+      /* CompletionItemKind.Method */
+    );
+    data.set(
+      "function",
+      1
+      /* CompletionItemKind.Function */
+    );
+    data.set(
+      "constructor",
+      2
+      /* CompletionItemKind.Constructor */
+    );
+    data.set(
+      "field",
+      3
+      /* CompletionItemKind.Field */
+    );
+    data.set(
+      "variable",
+      4
+      /* CompletionItemKind.Variable */
+    );
+    data.set(
+      "class",
+      5
+      /* CompletionItemKind.Class */
+    );
+    data.set(
+      "struct",
+      6
+      /* CompletionItemKind.Struct */
+    );
+    data.set(
+      "interface",
+      7
+      /* CompletionItemKind.Interface */
+    );
+    data.set(
+      "module",
+      8
+      /* CompletionItemKind.Module */
+    );
+    data.set(
+      "property",
+      9
+      /* CompletionItemKind.Property */
+    );
+    data.set(
+      "event",
+      10
+      /* CompletionItemKind.Event */
+    );
+    data.set(
+      "operator",
+      11
+      /* CompletionItemKind.Operator */
+    );
+    data.set(
+      "unit",
+      12
+      /* CompletionItemKind.Unit */
+    );
+    data.set(
+      "value",
+      13
+      /* CompletionItemKind.Value */
+    );
+    data.set(
+      "constant",
+      14
+      /* CompletionItemKind.Constant */
+    );
+    data.set(
+      "enum",
+      15
+      /* CompletionItemKind.Enum */
+    );
+    data.set(
+      "enum-member",
+      16
+      /* CompletionItemKind.EnumMember */
+    );
+    data.set(
+      "enumMember",
+      16
+      /* CompletionItemKind.EnumMember */
+    );
+    data.set(
+      "keyword",
+      17
+      /* CompletionItemKind.Keyword */
+    );
+    data.set(
+      "snippet",
+      27
+      /* CompletionItemKind.Snippet */
+    );
+    data.set(
+      "text",
+      18
+      /* CompletionItemKind.Text */
+    );
+    data.set(
+      "color",
+      19
+      /* CompletionItemKind.Color */
+    );
+    data.set(
+      "file",
+      20
+      /* CompletionItemKind.File */
+    );
+    data.set(
+      "reference",
+      21
+      /* CompletionItemKind.Reference */
+    );
+    data.set(
+      "customcolor",
+      22
+      /* CompletionItemKind.Customcolor */
+    );
+    data.set(
+      "folder",
+      23
+      /* CompletionItemKind.Folder */
+    );
+    data.set(
+      "type-parameter",
+      24
+      /* CompletionItemKind.TypeParameter */
+    );
+    data.set(
+      "typeParameter",
+      24
+      /* CompletionItemKind.TypeParameter */
+    );
+    data.set(
+      "account",
+      25
+      /* CompletionItemKind.User */
+    );
+    data.set(
+      "issue",
+      26
+      /* CompletionItemKind.Issue */
+    );
     function fromString(value, strict) {
       let res = data.get(value);
       if (typeof res === "undefined" && !strict) {
@@ -6924,6 +7698,11 @@
     SymbolKinds2.toIcon = toIcon;
   })(SymbolKinds || (SymbolKinds = {}));
   var FoldingRangeKind = class {
+    /**
+     * Creates a new {@link FoldingRangeKind}.
+     *
+     * @param value of the kind.
+     */
     constructor(value) {
       this.value = value;
     }
@@ -7535,12 +8314,27 @@
   // node_modules/monaco-editor/esm/vs/editor/common/core/wordCharacterClassifier.js
   var WordCharacterClassifier = class extends CharacterClassifier {
     constructor(wordSeparators) {
-      super(0);
+      super(
+        0
+        /* WordCharacterClass.Regular */
+      );
       for (let i = 0, len = wordSeparators.length; i < len; i++) {
-        this.set(wordSeparators.charCodeAt(i), 2);
+        this.set(
+          wordSeparators.charCodeAt(i),
+          2
+          /* WordCharacterClass.WordSeparator */
+        );
       }
-      this.set(32, 1);
-      this.set(9, 1);
+      this.set(
+        32,
+        1
+        /* WordCharacterClass.Whitespace */
+      );
+      this.set(
+        9,
+        1
+        /* WordCharacterClass.Whitespace */
+      );
     }
   };
   function once2(computeFn) {
@@ -7743,7 +8537,10 @@
         case 0:
           return null;
         case 2:
-          return { kind: 1 };
+          return {
+            kind: 1
+            /* UnicodeHighlighterReasonKind.Invisible */
+          };
         case 3: {
           const codePoint = char.codePointAt(0);
           const primaryConfusable = codePointHighlighter.ambiguousCharacters.getPrimaryConfusable(codePoint);
@@ -7751,7 +8548,10 @@
           return { kind: 0, confusableWith: String.fromCodePoint(primaryConfusable), notAmbiguousInLocales };
         }
         case 1:
-          return { kind: 2 };
+          return {
+            kind: 2
+            /* UnicodeHighlighterReasonKind.NonBasicAscii */
+          };
       }
     }
   };
@@ -7807,7 +8607,11 @@
           }
         }
       }
-      if (!hasBasicASCIICharacters && hasNonConfusableNonBasicAsciiCharacter) {
+      if (
+        /* Don't allow mixing weird looking characters with ASCII */
+        !hasBasicASCIICharacters && /* Is there an obviously weird looking character? */
+        hasNonConfusableNonBasicAsciiCharacter
+      ) {
         return 0;
       }
       if (this.options.invisibleCharacters) {
@@ -8053,6 +8857,7 @@
         return UnicodeTextModelHighlighter.computeUnicodeHighlights(model, options, range);
       });
     }
+    // ---- BEGIN diff --------------------------------------------------------------------------
     computeDiff(originalUrl, modifiedUrl, ignoreTrimWhitespace, maxComputationTime) {
       return __awaiter2(this, void 0, void 0, function* () {
         const original = this._getModel(originalUrl);
@@ -8148,6 +8953,7 @@
         return result;
       });
     }
+    // ---- END minimal edits ---------------------------------------------------------------
     computeLinks(modelUrl) {
       return __awaiter2(this, void 0, void 0, function* () {
         const model = this._getModel(modelUrl);
@@ -8181,6 +8987,8 @@
         return { words: Array.from(seen), duration: sw.elapsed() };
       });
     }
+    // ---- END suggest --------------------------------------------------------------------------
+    //#region -- word ranges --
     computeWordRanges(modelUrl, range, wordDef, wordDefFlags) {
       return __awaiter2(this, void 0, void 0, function* () {
         const model = this._getModel(modelUrl);
@@ -8211,6 +9019,7 @@
         return result;
       });
     }
+    //#endregion
     navigateValueSet(modelUrl, range, up, wordDef, wordDefFlags) {
       return __awaiter2(this, void 0, void 0, function* () {
         const model = this._getModel(modelUrl);
@@ -8236,6 +9045,7 @@
         return result;
       });
     }
+    // ---- BEGIN foreign module support --------------------------------------------------------------------------
     loadForeignModule(moduleId, createData, foreignHostMethods) {
       const proxyMethodRequest = (method, args) => {
         return this._host.fhr(method, args);
@@ -8253,6 +9063,7 @@
       }
       return Promise.reject(new Error(`Unexpected usage`));
     }
+    // foreign method request
     fmr(method, args) {
       if (!this._foreignModule || typeof this._foreignModule[method] !== "function") {
         return Promise.reject(new Error("Missing requestHandler or method: " + method));
@@ -24311,9 +25122,13 @@
     });
   };
 })();
-/*!-----------------------------------------------------------------------------
- * Copyright (c) Microsoft Corporation. All rights reserved.
- * Version: 0.34.1(547870b6881302c5b4ff32173c16d06009e3588f)
- * Released under the MIT license
- * https://github.com/microsoft/monaco-editor/blob/main/LICENSE.txt
- *-----------------------------------------------------------------------------*/
+/*! Bundled license information:
+
+monaco-editor/esm/vs/language/html/html.worker.js:
+  (*!-----------------------------------------------------------------------------
+   * Copyright (c) Microsoft Corporation. All rights reserved.
+   * Version: 0.34.1(547870b6881302c5b4ff32173c16d06009e3588f)
+   * Released under the MIT license
+   * https://github.com/microsoft/monaco-editor/blob/main/LICENSE.txt
+   *-----------------------------------------------------------------------------*)
+*/

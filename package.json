@@ -23,8 +23,8 @@
     "gen:icons": "node ./src/icon/scripts/gen-icons.js"
   },
   "devDependencies": {
-    "esbuild": "^0.14.49",
-    "esbuild-sass-plugin": "^2.3.0",
+    "esbuild": "^0.17.11",
+    "esbuild-sass-plugin": "^2.6.0",
     "jquery": "^3.6.0",
     "jsdom": "^20.0.0",
     "local-dev-server": "^1.0.12",

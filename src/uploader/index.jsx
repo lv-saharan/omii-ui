@@ -15,20 +15,21 @@ const STATUS = {
   ERROR: "ERROR",
 };
 export default class extends uiBase {
-  static creatPreviewUrl = creatPreviewUrl
+  static creatPreviewUrl = creatPreviewUrl;
   static get STATUS() {
     return STATUS;
   }
   static css = [
-    () => getCSSStyleSheets(
-      "reboot",
-      "containers",
-      "grid",
-      "card",
-      "utilities",
-      "buttons",
-      "tables"
-    ),
+    () =>
+      getCSSStyleSheets(
+        "reboot",
+        "containers",
+        "grid",
+        "card",
+        "utilities",
+        "buttons",
+        "tables"
+      ),
     css,
   ];
   static defaultProps = {
@@ -59,13 +60,12 @@ export default class extends uiBase {
   open(index = -1) {
     this.#replaceIndex = index;
     this.$("#files").click();
-    this.fire("open", { index })
+    this.fire("open", { index });
   }
   remove(index) {
     this.$props.files?.splice(index, 1);
     this.updateSelf();
-    this.fire("remove", { index })
-
+    this.fire("remove", { index });
   }
 
   select(files) {
@@ -110,16 +110,19 @@ export default class extends uiBase {
   upload() {
     let { files, action, withCredentials, headers } = this.$props;
     if (!action) alert("没有设置上传地址");
+    let index = 0;
     for (let file of files.filter(
       (f) =>
         f.file &&
         (!f.status || f.status == STATUS.NONE || f.status == STATUS.ERROR)
     )) {
+      file.index = index++;
       let fd = new FormData();
       fd.append("file", file.file);
       let xhr = new XMLHttpRequest();
-      xhr.open("POST", action);
       xhr.withCredentials = withCredentials;
+      xhr.open("POST", action);
+
       if (typeof headers === "function") {
         headers = headers();
       }
@@ -128,18 +131,18 @@ export default class extends uiBase {
           xhr.setRequestHeader(key, headers[key]);
         }
       }
-      xhr.send(fd);
+
       xhr.onreadystatechange = (args) => {
         if (xhr.readyState === 4 && xhr.status === 200) {
           console.log("上传成功");
           let data = xhr.responseText;
           try {
-            data = JSON.parse(data)
+            data = JSON.parse(data);
           } catch (exc) {
-            console.error(exc)
+            console.error(exc);
           }
           // Object.assign(file, data);
-          this.fire("uploaded", { file, data });
+          this.fire("uploaded", { file, data, uploader: this });
           this.refresh();
         } else {
           file.status = STATUS.ERROR;
@@ -147,15 +150,16 @@ export default class extends uiBase {
         }
       };
       //监听文件上传（xhr.upload）进度
-      xhr.upload.onprogress = e => {
+      xhr.upload.onprogress = (e) => {
         if (e.lengthComputable) {
           let percentage = Math.ceil((e.loaded / e.total) * 100);
           file.progress = percentage;
-          this.fire("progress", { file, loaded: e.loaded });
+          this.fire("progress", { file, loaded: e.loaded, uploader: this });
           console.log(percentage + "%");
           this.refresh();
         }
       };
+      xhr.send(fd);
     }
   }
   render() {

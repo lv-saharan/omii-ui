@@ -25,11 +25,18 @@ export default class extends uiBase {
     striped: Boolean,
     animated: Boolean,
   };
-  setValue(val) {
-    this.$props.value = value;
+  set value(val) {
+    this.$props.value = val;
     this.update();
   }
-  css() { }
+  get value() {
+    return this.$props.value;
+  }
+  setValue(val) {
+    this.$props.value = val;
+    this.update();
+  }
+  css() {}
   render(props) {
     let {
       label,

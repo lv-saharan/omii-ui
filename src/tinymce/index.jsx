@@ -8,7 +8,6 @@ let min = true;
 let root = new URL(`./tinymce/`, import.meta.url).href;
 let jsFile = `./tinymce.js`;
 
-
 export default class extends uiBase {
   static css = [() => getCSSStyleSheets("reboot", "scrollbar"), css];
   static propTypes = {
@@ -16,11 +15,12 @@ export default class extends uiBase {
     placeholder: String,
     required: Boolean,
     inline: Boolean,
-    readonly: Boolean
+    readonly: Boolean,
   };
   static defaultProps = {
     //编辑器引擎
     value: "",
+    relativeUrls: null,
     width: null,
     height: null,
     minWidth: null,
@@ -114,7 +114,7 @@ export default class extends uiBase {
       try {
         this.editor.setContent(value);
       } catch (exc) {
-        console.log("editor not init")
+        console.log("editor not init");
       }
     }
     //这里不能fire change，这样容易引起循环调用
@@ -157,13 +157,13 @@ export default class extends uiBase {
   }
 
   get editorId() {
-    return `editor${this.elementId}`
+    return `editor${this.elementId}`;
   }
-  #ready = false
+  #ready = false;
 
   async installed() {
     // console.log("tiny installed");
-    await this.constructor.use()
+    await this.constructor.use();
     const $editor = this.$(`#${this.editorId}`);
     const {
       menu,
@@ -200,6 +200,7 @@ export default class extends uiBase {
       imageDimensions,
       imageTitle,
       imagePrependUrl,
+      relativeUrls,
       automaticUploads,
       filePickerTypes,
       filePickerCallback,
@@ -213,7 +214,7 @@ export default class extends uiBase {
       maxWidth,
       maxHeight,
       resize,
-      placeholder
+      placeholder,
     } = this.$props;
     tinymce.init({
       target: $editor,
@@ -265,19 +266,20 @@ export default class extends uiBase {
       min_height: minHeight,
       max_width: maxWidth,
       max_height: maxHeight,
+      relative_urls: relativeUrls,
       resize,
       placeholder,
       setup: (editor) => {
         this.#editor = editor;
-        this.fire("setup", { editor })
+        this.fire("setup", { editor });
 
-        editor.on("init", e => {
-          this.#ready = true
-          this.fire("ready")
-        })
-        editor.on("blur", e => {
-          console.log("editor blur")
-        })
+        editor.on("init", (e) => {
+          this.#ready = true;
+          this.fire("ready");
+        });
+        editor.on("blur", (e) => {
+          console.log("editor blur");
+        });
         editor.on("change", (e) => {
           this.$props.value = editor.getContent();
           this.fire("change", { value: this.value });
@@ -286,10 +288,14 @@ export default class extends uiBase {
     });
   }
   render() {
-    const { inline } = this.$props
-    return inline ? <div >
-      <div class="editor" id={this.editorId}>{this.value}</div>
-    </div> : (
+    const { inline } = this.$props;
+    return inline ? (
+      <div>
+        <div class="editor" id={this.editorId}>
+          {this.value}
+        </div>
+      </div>
+    ) : (
       <textarea
         class="editor"
         id={this.editorId}

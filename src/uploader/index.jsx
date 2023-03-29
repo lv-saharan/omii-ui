@@ -96,6 +96,7 @@ export default class extends uiBase {
           type: file.type,
           lastModified: file.lastModified,
           file,
+          status: STATUS.NONE,
         };
       });
       all.push(...selected);
@@ -112,9 +113,7 @@ export default class extends uiBase {
     if (!action) alert("没有设置上传地址");
     let index = 0;
     for (let file of files.filter(
-      (f) =>
-        f.file &&
-        (!f.status || f.status == STATUS.NONE || f.status == STATUS.ERROR)
+      (f) => f.file && (!f.status || f.status == STATUS.NONE)
     )) {
       file.index = index++;
       let fd = new FormData();
@@ -132,6 +131,7 @@ export default class extends uiBase {
         }
       }
 
+      file.status = STATUS.UPLOADING;
       xhr.onreadystatechange = (args) => {
         if (xhr.readyState === 4 && xhr.status === 200) {
           console.log("上传成功");
@@ -141,13 +141,15 @@ export default class extends uiBase {
           } catch (exc) {
             console.error(exc);
           }
+          file.status = STATUS.UPLOADED;
           // Object.assign(file, data);
           this.fire("uploaded", { file, data, uploader: this });
           this.refresh();
-        } else {
-          file.status = STATUS.ERROR;
-          console.log("上传失败", xhr, args);
         }
+        // else {
+        //   file.status = STATUS.ERROR;
+        //   console.log("上传失败", xhr, args);
+        // }
       };
       //监听文件上传（xhr.upload）进度
       xhr.upload.onprogress = (e) => {
@@ -175,6 +177,7 @@ export default class extends uiBase {
           accept={accept}
           onChange={(evt) => {
             this.select(evt.target.files);
+            evt.target.value = null;
           }}
         />
       </>

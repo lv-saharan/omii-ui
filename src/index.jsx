@@ -69,6 +69,7 @@ customElements.define("oi-form", form, { extends: "form" });
 const importURL = import.meta.url;
 
 omii.ui = {
+  version:"1.1.5",
   utils,
   css,
   effect,

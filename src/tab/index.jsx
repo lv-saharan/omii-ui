@@ -41,16 +41,14 @@ export default class extends uiBase {
           },
           { ignoreAttrs: true, updateSelf: true }
         );
-
-        
       }
     }
   }
 
   get slotPanes() {
-    const slot = this.$("slot")
-    const panes = slot?.assignedElements()
-    return panes
+    const slot = this.$("slot");
+    const panes = slot?.assignedElements();
+    return panes;
   }
   async render(props) {
     let settings = this.$props;

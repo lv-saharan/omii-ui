@@ -2,44 +2,43 @@ const { h } = omii;
 
 import uiBase from "../../uiBase";
 
-const iconsCache = new Map()
+const iconsCache = new Map();
 
 const loadIcon = async (name) => {
   try {
     const key = name;
-    let cachedIcon = iconsCache.get(key)
+    let cachedIcon = iconsCache.get(key);
     if (cachedIcon == undefined) {
       cachedIcon = {
         icon: false,
-        resolves: []
-      }
-      iconsCache.set(key, cachedIcon)
+        resolves: [],
+      };
+      iconsCache.set(key, cachedIcon);
       try {
-        const { default: icon } = await import(`./bootstrap/icons/${name}.js`)
-        cachedIcon.icon = icon
-      }
-      catch {
+        const { default: icon } = await import(`./bootstrap/icons/${name}.js`);
+        cachedIcon.icon = icon;
+      } catch {
         // console.info("icon load error", type, name)
-        cachedIcon.icon = null
+        cachedIcon.icon = null;
       }
       for (let resolve of cachedIcon.resolves) {
-        resolve(cachedIcon.icon)
+        resolve(cachedIcon.icon);
       }
-      cachedIcon.resolves = []
-      return cachedIcon.icon
+      cachedIcon.resolves = [];
+      return cachedIcon.icon;
     }
 
     if (cachedIcon.icon === false) {
       return new Promise((resolve, reject) => {
-        cachedIcon.resolves.push(resolve)
-      })
+        cachedIcon.resolves.push(resolve);
+      });
     }
-    return cachedIcon.icon
+    return cachedIcon.icon;
     // const { default: icon } = await import(`./bootstrap/icons/${name}.js`);
     // return icon;
   } catch {
     console.error("load icon error", name);
-    return null
+    return null;
   }
 };
 const createSvg = async (name, props = {}) => {

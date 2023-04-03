@@ -27,9 +27,8 @@ export default class extends uiBase {
     let loadingSize = "2rem";
 
     if (!size) {
-      let parent = this.parentNode?.host ?? this.parentNode
-      if (parent)
-        loadingSize = `${parent.offsetHeight}px`;
+      let parent = this.parentNode?.host ?? this.parentNode;
+      if (parent) loadingSize = `${parent.offsetHeight}px`;
       else {
         loadingSize = "2rem";
       }
@@ -59,36 +58,36 @@ export default class extends uiBase {
 
   async getLoadingConfig() {
     let { name } = this.$props;
-    const key = name
-    let loadingConfig = loadingCache.get(key)
+    const key = name;
+    let loadingConfig = loadingCache.get(key);
     if (loadingConfig == undefined) {
-      loadingConfig = []
-      loadingCache.set(key, loadingConfig)
+      loadingConfig = [];
+      loadingCache.set(key, loadingConfig);
       try {
-        const { default: config } = await import(`./loadings/${name}.js`)
-        loadingCache.set(key, config)
+        const { default: config } = await import(`./loadings/${name}.js`);
+        loadingCache.set(key, config);
         for (let { resolve } of loadingConfig) {
-          resolve(config)
+          resolve(config);
         }
-        return config
+        return config;
       } catch {
         // console.info("icon load error", type, name)
-        loadingCache.set(key, null)
+        loadingCache.set(key, null);
         for (let { resolve } of loadingConfig) {
-          resolve(null)
+          resolve(null);
         }
         return null;
       }
     }
     if (loadingConfig instanceof Array) {
       return new Promise((resolve, reject) => {
-        loadingConfig.push({ resolve, reject })
-      })
+        loadingConfig.push({ resolve, reject });
+      });
     }
-    return loadingConfig
+    return loadingConfig;
   }
   async render() {
-    const { template, css } = await this.getLoadingConfig()
+    const { template, css } = await this.getLoadingConfig();
     this.#css = css;
     return template;
   }

@@ -5,11 +5,10 @@ import { getCSSStyleSheets, timingClassNames } from "../css";
 import css from "./index.scss";
 // import effect from "../effect";
 
-
-
 export default class extends uiBase {
   static css = [
-    () => getCSSStyleSheets("reboot", "modal", "utilities", "close", "scrollbar"),
+    () =>
+      getCSSStyleSheets("reboot", "modal", "utilities", "close", "scrollbar"),
     css,
   ];
   static defaultProps = {
@@ -34,32 +33,38 @@ export default class extends uiBase {
   };
   open() {
     this.update$Props({ visible: true }).then(() => {
-      timingClassNames(this.$dialog, [{
-        classNames: "show",
-      }])
-    })
+      timingClassNames(this.$dialog, [
+        {
+          classNames: "show",
+        },
+      ]);
+    });
 
     this.fire("open");
   }
   close() {
-    timingClassNames(this.$dialog, [{
-      classNames: "show",
-    }, {
-      classNames: "",
-      duration: .15,
-    }, {
-      classNames: "",
-      callback: () => {
-        this.update$Props({ visible: false });
-      }
-    }])
+    timingClassNames(this.$dialog, [
+      {
+        classNames: "show",
+      },
+      {
+        classNames: "",
+        duration: 0.15,
+      },
+      {
+        classNames: "",
+        callback: () => {
+          this.update$Props({ visible: false });
+        },
+      },
+    ]);
     this.fire("close");
   }
 
   get $dialog() {
-    return this.$(".modal-dialog")
+    return this.$(".modal-dialog");
   }
-  css() { }
+  css() {}
 
   render(props) {
     let settings = this.$props;

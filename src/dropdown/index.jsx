@@ -113,18 +113,20 @@ export default class extends uiBase {
   }
 
   installed() {
-    const { trigger } = this.$props
+    const { trigger } = this.$props;
 
     if (trigger == "click") {
       this.#$reference.addEventListener("click", (evt) => {
-        if ($visibleDropDown && $visibleDropDown != this) $visibleDropDown.hide();
+        if ($visibleDropDown && $visibleDropDown != this)
+          $visibleDropDown.hide();
         evt.preventDefault();
         evt.stopImmediatePropagation();
         this.toggle();
       });
     } else if (trigger == "focus") {
       this.#$reference.addEventListener("focus", (evt) => {
-        if ($visibleDropDown && $visibleDropDown != this) $visibleDropDown.hide();
+        if ($visibleDropDown && $visibleDropDown != this)
+          $visibleDropDown.hide();
         evt.preventDefault();
         evt.stopImmediatePropagation();
         this.show();
@@ -134,7 +136,6 @@ export default class extends uiBase {
         evt.stopImmediatePropagation();
         this.hide();
       });
-
     }
     this.addEventListener("click", (evt) => {
       evt.stopImmediatePropagation();

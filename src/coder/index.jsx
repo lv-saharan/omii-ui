@@ -9,13 +9,16 @@ export default class extends uiBase {
       const fontCSS = `@font-face {
         font-family: "codicon";
         font-display: block;
-        src: url(${new URL("./monaco", importUrl).href}/codicon-BEBTMDKB.ttf) format("truetype");
-      }`
-      const fontCSSSS = new CSSStyleSheet()
-      fontCSSSS.replace(fontCSS)
-      document.adoptedStyleSheets = [...document.adoptedStyleSheets, fontCSSSS]
-      return fetch(new URL("./monaco/index.css", importUrl).href)
-        .then((r) => r.text())
+        src: url(${
+          new URL("./monaco", importUrl).href
+        }/codicon-BEBTMDKB.ttf) format("truetype");
+      }`;
+      const fontCSSSS = new CSSStyleSheet();
+      fontCSSSS.replace(fontCSS);
+      document.adoptedStyleSheets = [...document.adoptedStyleSheets, fontCSSSS];
+      return fetch(new URL("./monaco/index.css", importUrl).href).then((r) =>
+        r.text()
+      );
     },
     css,
   ];
@@ -51,7 +54,6 @@ export default class extends uiBase {
           automaticLayout,
           fontSize,
           minimap: { enabled: false },
-
         });
         // this.editor.onDidCreateEditor((evt) => {
         //   console.log("editor create", evt)

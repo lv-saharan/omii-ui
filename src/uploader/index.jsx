@@ -44,6 +44,65 @@ export default class extends uiBase {
     withCredentials: false,
     template: "pictures", // file,picture-form,file-form,
     files: [], //{id,name,size,file,url,ext,type,status}
+    uploadHandler(
+      resource,
+      url,
+      { paramName = "file", withCredentials = false, headers }
+    ) {
+      const file = resource.file;
+      const xhr = new XMLHttpRequest();
+      const fd = new FormData();
+      fd.append(paramName, file);
+      xhr.withCredentials = withCredentials;
+      xhr.open("POST", url);
+
+      if (typeof headers === "function") {
+        headers = headers();
+      }
+      if (typeof headers === "object") {
+        for (let key in headers) {
+          xhr.setRequestHeader(key, headers[key]);
+        }
+      }
+
+      resource.status = STATUS.UPLOADING;
+      xhr.onreadystatechange = (args) => {
+        if (xhr.readyState === 4 && xhr.status === 200) {
+          console.log("上传成功");
+          let data = xhr.responseText;
+          try {
+            data = JSON.parse(data);
+          } catch (exc) {
+            resource.status = STATUS.ERROR;
+            console.error(exc);
+          }
+          resource.status = STATUS.UPLOADED;
+          // Object.assign(file, data);
+          this.fire("uploaded", { resource, data, uploader: this });
+          this.refresh();
+        }
+        if (xhr.status > 400) {
+          file.status = STATUS.ERROR;
+          console.log("上传失败", xhr, args);
+        }
+
+        // else {
+        //   file.status = STATUS.ERROR;
+        //   console.log("上传失败", xhr, args);
+        // }
+      };
+      //监听文件上传（xhr.upload）进度
+      xhr.upload.onprogress = (e) => {
+        if (e.lengthComputable) {
+          let percentage = Math.ceil((e.loaded / e.total) * 100);
+          resource.progress = percentage;
+          this.fire("progress", { resource, loaded: e.loaded, uploader: this });
+          console.log(percentage + "%");
+          this.refresh();
+        }
+      };
+      xhr.send(fd);
+    },
   };
   static propTypes = {
     accept: String,
@@ -108,60 +167,19 @@ export default class extends uiBase {
   refresh() {
     this.forceUpdate();
   }
+  get uploadHandler() {
+    return this.$props.uploadHandler;
+  }
   upload() {
     let { files, action, withCredentials, headers } = this.$props;
     if (!action) alert("没有设置上传地址");
     let index = 0;
+
     for (let file of files.filter(
       (f) => f.file && (!f.status || f.status == STATUS.NONE)
     )) {
       file.index = index++;
-      let fd = new FormData();
-      fd.append("file", file.file);
-      let xhr = new XMLHttpRequest();
-      xhr.withCredentials = withCredentials;
-      xhr.open("POST", action);
-
-      if (typeof headers === "function") {
-        headers = headers();
-      }
-      if (typeof headers === "object") {
-        for (let key in headers) {
-          xhr.setRequestHeader(key, headers[key]);
-        }
-      }
-
-      file.status = STATUS.UPLOADING;
-      xhr.onreadystatechange = (args) => {
-        if (xhr.readyState === 4 && xhr.status === 200) {
-          console.log("上传成功");
-          let data = xhr.responseText;
-          try {
-            data = JSON.parse(data);
-          } catch (exc) {
-            console.error(exc);
-          }
-          file.status = STATUS.UPLOADED;
-          // Object.assign(file, data);
-          this.fire("uploaded", { file, data, uploader: this });
-          this.refresh();
-        }
-        // else {
-        //   file.status = STATUS.ERROR;
-        //   console.log("上传失败", xhr, args);
-        // }
-      };
-      //监听文件上传（xhr.upload）进度
-      xhr.upload.onprogress = (e) => {
-        if (e.lengthComputable) {
-          let percentage = Math.ceil((e.loaded / e.total) * 100);
-          file.progress = percentage;
-          this.fire("progress", { file, loaded: e.loaded, uploader: this });
-          console.log(percentage + "%");
-          this.refresh();
-        }
-      };
-      xhr.send(fd);
+      this.uploadHandler.call(this, file, action, { withCredentials, headers });
     }
   }
   render() {

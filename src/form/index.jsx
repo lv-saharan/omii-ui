@@ -26,7 +26,7 @@ function inputingHandler(evt) {
 }
 function validate(form) {
   const valid = form.checkValidity();
-  const others = [...form.querySelectorAll("[data-validate")];
+  const others = [...form.querySelectorAll("[data-validate]")];
 
   [...form.elements, ...others].forEach((el) => {
     validateElement(el);

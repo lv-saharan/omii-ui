@@ -17,7 +17,7 @@ export default class extends uiBase {
     max: Number,
   };
   static defaultProps = {
-    options: [], //value:text
+    options: [], //value:text,element
     values: [],
     value: null,
     multiple: true,
@@ -43,7 +43,9 @@ export default class extends uiBase {
             />
           )}
 
-          <label class="form-check-label flex-grow-1">{option.text}</label>
+          <label class="form-check-label flex-grow-1">
+            {option.element ?? option.text}
+          </label>
         </div>
       );
     },

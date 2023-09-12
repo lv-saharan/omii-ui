@@ -24,42 +24,68 @@ export default class extends uiBase {
   ];
   static defaultProps = {
     codes: "",
+    minimap: false,
     language: "javascript",
     automaticLayout: true,
     fontSize: 12,
+    readOnly: false,
+    lineNumbers: "on", //on | off
+    theme: null, //vs-dark
   };
   static propTypes = {
     codes: String,
     language: String,
     fontSize: Number,
     automaticLayout: Boolean,
+    readOnly: Boolean,
+    lineNumbers: String,
+    theme: String,
   };
   #monaco;
 
   get value() {
-    return this.editor?.getValue();
+    return this.editor?.getValue() ?? this.$props.value;
   }
   set value(val) {
-    this.editor?.setValue(val);
+    if (!this.editor) {
+      this.$props.value = val;
+    } else {
+      this.editor?.setValue(val);
+    }
+  }
+  updateOptions(options) {
+    this.editor.updateOptions(options);
   }
 
+  #myForm = null;
+  #resetListener(evt) {
+    this.value = "";
+  }
   installed() {
-    let { codes, language, automaticLayout, fontSize } = this.$props;
+    this.$props.value = this.$props.value ?? this.$props.codes;
     import(new URL("./monaco/index.js", import.meta.url).href).then(
       ({ monaco }) => {
         this.#monaco = monaco;
         this.editor = monaco.editor.create(this.$(".coder"), {
-          value: codes,
-          language,
-          automaticLayout,
-          fontSize,
-          minimap: { enabled: false },
+          ...this.$props,
         });
         // this.editor.onDidCreateEditor((evt) => {
         //   console.log("editor create", evt)
         // })
+        this.editor.onDidChangeModelContent((evt) => {
+          this.fire("change", { value: this.value });
+        });
       }
     );
+    this.#myForm = this.closest("form");
+    if (this.#myForm) {
+      this.#myForm.addEventListener("reset", this.#resetListener);
+    }
+  }
+  uninstall() {
+    if (this.#myForm) {
+      this.#myForm.removeEventListener("reset", this.#resetListener);
+    }
   }
   render() {
     return <div class="coder"></div>;

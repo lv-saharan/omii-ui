@@ -20,6 +20,12 @@ export default class extends uiBase {
   static defaultProps = {
     //编辑器引擎
     value: "",
+    isEmpty(value) {
+      if (typeof value != "string") {
+        return true;
+      }
+      return value == "";
+    },
     relativeUrls: null,
     width: null,
     height: null,
@@ -132,11 +138,11 @@ export default class extends uiBase {
   }
 
   get validity() {
-    const { required } = this.$props;
+    const { required, isEmpty } = this.$props;
     const result = {
       valid: true,
     };
-    if (required && value == "") {
+    if (required && isEmpty(this.value)) {
       result.valid = false;
       result.valueMissing = true;
     }
@@ -145,6 +151,10 @@ export default class extends uiBase {
   }
   //已经检查过有效性
   #checked = false;
+  /**
+   * 验证
+   * @returns {boolean}
+   */
   checkValidity() {
     this.#checked = true;
     const valid = this.validity.valid;
@@ -156,6 +166,9 @@ export default class extends uiBase {
     return valid;
   }
 
+  /**
+   * 获取编辑器Id
+   */
   get editorId() {
     return `editor${this.elementId}`;
   }
@@ -163,6 +176,9 @@ export default class extends uiBase {
 
   async installed() {
     // console.log("tiny installed");
+    //允许验证
+    this.dataset.validate = true;
+
     await this.constructor.use();
     const $editor = this.$(`#${this.editorId}`);
     const {

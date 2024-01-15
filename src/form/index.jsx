@@ -32,11 +32,10 @@ function validate(form) {
     validateElement(el);
   });
   form.classList.add("was-validated");
-  return (
-    others.every((other) =>
-      other.checkValidity ? other.checkValidity() : true
-    ) && valid
+  const validities = others.map((other) =>
+    other.checkValidity ? other.checkValidity() : true
   );
+  return valid && validities.every((ok) => ok);
 }
 function submitHandler(evt) {
   const form = evt.target;

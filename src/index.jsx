@@ -34,42 +34,98 @@ import table from "./table";
 import tinymce from "./tinymce";
 import echarts from "./echarts";
 
-define("oi-rate", rate);
-define("oi-tab", tab);
-define("oi-icon", icon);
-define("oi-bi", bicon);
-define("oi-pager", pager);
-define("oi-tree", tree);
-define("oi-loading", loading);
-define("oi-alert", alert);
-define("oi-accordion", accordion);
-define("oi-breadcrumb", breadcrumb);
-define("oi-modal", modal);
-define("oi-popover", popover);
-define("oi-uploader", uploader);
-define("oi-carousel", carousel);
-define("oi-badge", badge);
-define("oi-toast", toast);
-define("oi-progress", progress);
-define("oi-tooltip", tooltip);
-define("oi-layout", layout);
-define("oi-import", _import);
-define("oi-offcanvas", offcanvas);
-define("oi-pagination", pagination);
-define("oi-dropdown", dropdown);
-define("oi-coder", coder);
-define("oi-select", select);
-define("oi-table", table);
-define("oi-tinymce", tinymce);
-define("oi-echarts", echarts);
+const Prefix = "oi";
+export const RateTag = `${Prefix}-rate`;
+define(RateTag, rate);
 
-// define("oi-form", form);
-customElements.define("oi-form", form, { extends: "form" });
+export const TabTag = `${Prefix}-tab`;
+define(TabTag, tab);
+
+export const IconTag = `${Prefix}-icon`;
+define(IconTag, icon);
+
+export const BootstrapIconTag = `${Prefix}-bi`;
+define(BootstrapIconTag, bicon);
+
+export const PagerTag = `${Prefix}-pager`;
+define(PagerTag, pager);
+
+export const TreeTag = `${Prefix}-tree`;
+define(TreeTag, tree);
+
+export const LoadingTag = `${Prefix}-loading`;
+define(LoadingTag, loading);
+
+export const AlertTag = `${Prefix}-alert`;
+define(AlertTag, alert);
+
+export const AccordionTag = `${Prefix}-accordion`;
+define(AccordionTag, accordion);
+
+export const BreadcrumbTag = `${Prefix}-breadcrumb`;
+define(BreadcrumbTag, breadcrumb);
+
+export const ModalTag = `${Prefix}-modal`;
+define(ModalTag, modal);
+
+export const PopoverTag = `${Prefix}-popover`;
+define(PopoverTag, popover);
+
+export const UploaderTag = `${Prefix}-uploader`;
+define(UploaderTag, uploader);
+
+export const CarouselTag = `${Prefix}-carousel`;
+define(CarouselTag, carousel);
+
+export const BadgeTag = `${Prefix}-badge`;
+define(BadgeTag, badge);
+
+export const ToastTag = `${Prefix}-toast`;
+define(ToastTag, toast);
+
+export const ProgressTag = `${Prefix}-progress`;
+define(ProgressTag, progress);
+
+export const TooltipTag = `${Prefix}-tooltip`;
+define(TooltipTag, tooltip);
+
+export const LayoutTag = `${Prefix}-layout`;
+define(LayoutTag, layout);
+
+export const ImportTag = `${Prefix}-import`;
+define(ImportTag, _import);
+
+export const OffcanvasTag = `${Prefix}-offcanvas`;
+define(OffcanvasTag, offcanvas);
+
+export const PaginationTag = `${Prefix}-pagination`;
+define(PaginationTag, pagination);
+
+export const DropdownTag = `${Prefix}-dropdown`;
+define(DropdownTag, dropdown);
+
+export const CoderTag = `${Prefix}-coder`;
+define(CoderTag, coder);
+
+export const SelectTag = `${Prefix}-select`;
+define(SelectTag, select);
+
+export const TableTag = `${Prefix}-table`;
+define(TableTag, table);
+
+export const TinymceTag = `${Prefix}-tinymce`;
+define(TinymceTag, tinymce);
+
+export const EchartsTag = `${Prefix}-echarts`;
+define(EchartsTag, echarts);
+
+// define(`${Prefix}-form", form);
+customElements.define(`${Prefix}-form`, form, { extends: "form" });
 
 const importURL = import.meta.url;
 
 omii.ui = {
-  version:"1.1.8",
+  version: "1.1.9",
   utils,
   css,
   effect,
@@ -104,6 +160,33 @@ omii.ui = {
   sortable,
   tinymce,
   echarts,
+  EchartsTag,
+  TinymceTag,
+  TableTag,
+  SelectTag,
+  DropdownTag,
+  PaginationTag,
+  OffcanvasTag,
+  ImportTag,
+  LayoutTag,
+  TooltipTag,
+  ProgressTag,
+  ToastTag,
+  BadgeTag,
+  CarouselTag,
+  UploaderTag,
+  PopoverTag,
+  ModalTag,
+  BreadcrumbTag,
+  AccordionTag,
+  AlertTag,
+  LoadingTag,
+  TreeTag,
+  PagerTag,
+  BootstrapIconTag,
+  IconTag,
+  TabTag,
+  RateTag,
 };
 
 export {

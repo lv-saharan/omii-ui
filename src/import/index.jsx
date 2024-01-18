@@ -32,6 +32,9 @@ export default class extends uiBase {
           } else if (typeof $module === "function") {
             const App = uniqueTag($module);
             this.#module = <App />;
+          } else if (typeof $module === "string") {
+            const App = $module;
+            this.#module = <App />;
           } else {
             this.#module = $module;
           }
@@ -44,9 +47,15 @@ export default class extends uiBase {
         });
     }
   }
-  install() {
+  /**
+   * 重新加载
+   */
+  reload() {
     let { src, module, loading, loadError } = this.$props;
     this.load(src, module, loading, loadError);
+  }
+  install() {
+    this.reload();
   }
   render(props) {
     return this.#module;

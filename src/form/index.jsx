@@ -21,29 +21,32 @@ function validateElement(el) {
 function inputingHandler(evt) {
   const form = evt.currentTarget;
   form.checkValidity();
-  validateElement(evt.target);
   form.classList.add("was-validated");
 }
-function validate(form) {
-  const valid = form.checkValidity();
+/**
+ * 自定义验证，所有标记 data-validate 属性的元素
+ * @param {HTMLFormElement} form
+ * @returns
+ */
+function checkCustomValidity(form) {
   const others = [...form.querySelectorAll("[data-validate]")];
 
   [...form.elements, ...others].forEach((el) => {
     validateElement(el);
   });
-  form.classList.add("was-validated");
   const validities = others.map((other) =>
     other.checkValidity ? other.checkValidity() : true
   );
-  return valid && validities.every((ok) => ok);
+  return validities.every((ok) => ok);
 }
+
 function submitHandler(evt) {
   const form = evt.target;
 
   form.removeEventListener("input", inputingHandler);
   form.addEventListener("input", inputingHandler, false);
 
-  if (!validate(form)) {
+  if (!OIForm.checkValidity(form)) {
     evt.preventDefault();
     evt.stopPropagation();
   }
@@ -54,14 +57,28 @@ export default class OIForm extends HTMLFormElement {
     form.removeEventListener("submit", submitHandler);
     form.addEventListener("submit", submitHandler, true);
   }
+  static checkValidity(form) {
+    form.classList.add("was-validated");
+    return form.checkValidity() && checkCustomValidity(form);
+  }
+
+  static reset(form) {
+    form.classList.remove("was-validated");
+    form.reset();
+  }
 
   reset() {
-    super.reset();
     this.classList.remove("was-validated");
+    super.reset();
   }
   validate() {
-    return validate(this);
+    return this.checkValidity();
   }
+  checkValidity() {
+    this.classList.add("was-validated");
+    return super.checkValidity() && checkCustomValidity(this);
+  }
+
   connectedCallback() {
     this.constructor.validate(this);
   }

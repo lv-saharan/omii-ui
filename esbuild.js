@@ -22,12 +22,15 @@ let defaultOptions = {
     minify: true,
 }
 
-let buildOptions = {
-    ...defaultOptions,
-    entryPoints: ['src/index.jsx'],
-    outfile,
-    plugins: [sassPlugin({
-        type: "css-text"
+const buildOptions = {
+  ...defaultOptions,
+  entryPoints: ["src/index.jsx"],
+  outfile,
+  plugins: [
+    sassPlugin({
+      type: "css-text",
+      sourceMap: false,
+      style: "compressed",
     })],
 }
 //minify sortablejs

@@ -1,5 +1,10 @@
 const { h, classNames, extractClass, createRef } = omii;
 
+function inputingHandler(evt) {
+  const form = evt.currentTarget;
+  form.checkValidity();
+  form.classList.add("was-validated");
+}
 function validateElement(el) {
   const { validity } = el;
   if (!validity) return;
@@ -18,11 +23,6 @@ function validateElement(el) {
     delete el.dataset.validationMessage;
   }
 }
-function inputingHandler(evt) {
-  const form = evt.currentTarget;
-  form.checkValidity();
-  form.classList.add("was-validated");
-}
 /**
  * 自定义验证，所有标记 data-validate 属性的元素
  * @param {HTMLFormElement} form
@@ -30,8 +30,8 @@ function inputingHandler(evt) {
  */
 function checkCustomValidity(form) {
   const others = [...form.querySelectorAll("[data-validate]")];
-
-  [...form.elements, ...others].forEach((el) => {
+  const all = [new Set([...others, ...form.elements])];
+  all.forEach((el) => {
     validateElement(el);
   });
   const validities = others.map((other) =>
@@ -59,7 +59,13 @@ export default class OIForm extends HTMLFormElement {
   }
   static checkValidity(form) {
     form.classList.add("was-validated");
-    return form.checkValidity() && checkCustomValidity(form);
+    if (form instanceof OIForm) {
+      return form.checkValidity();
+    } else {
+      return [form.checkValidity(), checkCustomValidity(form)].every(
+        (ok) => ok
+      );
+    }
   }
 
   static reset(form) {
@@ -76,7 +82,7 @@ export default class OIForm extends HTMLFormElement {
   }
   checkValidity() {
     this.classList.add("was-validated");
-    return super.checkValidity() && checkCustomValidity(this);
+    return [super.checkValidity(), checkCustomValidity(this)].every((ok) => ok);
   }
 
   connectedCallback() {

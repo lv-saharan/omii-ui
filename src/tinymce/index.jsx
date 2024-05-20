@@ -231,6 +231,8 @@ export default class extends uiBase {
       maxHeight,
       resize,
       placeholder,
+      setup,
+      ...options
     } = this.$props;
     tinymce.init({
       target: $editor,
@@ -285,6 +287,7 @@ export default class extends uiBase {
       relative_urls: relativeUrls,
       resize,
       placeholder,
+      ...options,
       setup: (editor) => {
         this.#editor = editor;
         this.fire("setup", { editor });

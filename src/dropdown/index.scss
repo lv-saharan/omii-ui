@@ -1,22 +1,21 @@
 :host {
-    position: relative;
+  position: relative;
+  display: inline-block;
+  slot:not([name]) {
+    display: inline-block;
+  }
 
-    slot:not([name]) {
-        display: inline-block;
+  slot[name="menu"] {
+    position: absolute;
+    z-index: 1000;
+    display: none;
+    padding: 0;
+    border: 0;
+    min-width: max-content;
+    min-width: --webkit-max-content;
+    .dropdown-menu {
+      display: block;
+      position: relative;
     }
-
-    slot[name=menu] {
-        position: absolute;
-        z-index: 1000;
-        display: none;
-        padding: 0;
-        border: 0;
-        min-width: fit-content;
-
-        .dropdown-menu {
-            display: block;
-            position: relative;
-        }
-    }
-
+  }
 }

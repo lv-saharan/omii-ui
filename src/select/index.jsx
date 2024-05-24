@@ -4,6 +4,8 @@ import { getCSSStyleSheets } from "../css";
 import css from "./index.scss";
 
 export default class extends uiBase {
+  //已经检查过有效性
+  #checked = false;
   static css = [
     () => getCSSStyleSheets("reboot", "utilities", "forms", "scrollbar"),
     css,
@@ -108,8 +110,7 @@ export default class extends uiBase {
     }
     return result;
   }
-  //已经检查过有效性
-  #checked = false;
+
   checkValidity() {
     this.#checked = true;
     const valid = this.validity.valid;

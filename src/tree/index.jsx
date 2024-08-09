@@ -22,7 +22,7 @@ export default class extends uiBase {
     checkedKeys: [], //多選
     radioedKey: null, //單選
     nodes: [], //節點
-    expander: <oi-icon name="keyboard_arrow_right" class="expander" />
+    expander: <oi-icon name="keyboard_arrow_right" class="expander" />,
   };
   static propTypes = {
     ignoreAttrs: Boolean,
@@ -75,6 +75,9 @@ export default class extends uiBase {
       }
     }
     if (update) this.update();
+  }
+  unselect(val, update = true) {
+    return this.unSelect(val, update);
   }
   unSelect(val, update = true) {
     let { multiSelect, selectedKeys } = this.$props;
@@ -142,6 +145,14 @@ export default class extends uiBase {
     let index = expandedKeys.indexOf(key);
     if (index != -1) expandedKeys.splice(index, 1);
     if (update) this.update();
+  }
+  collapseAll(update = true) {
+    this.expandedKeys.forEach((key) => {
+      this.collapse(key, false);
+    });
+    if (update) {
+      this.update();
+    }
   }
   async installed() {
     if (this.$props.sortable) {

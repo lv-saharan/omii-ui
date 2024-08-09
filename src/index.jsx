@@ -125,7 +125,7 @@ customElements.define(`${Prefix}-form`, form, { extends: "form" });
 const importURL = import.meta.url;
 
 omii.ui = {
-  version: "1.1.16",
+  version: "1.1.17",
   utils,
   css,
   effect,

@@ -19,13 +19,16 @@ class TreeNode extends uiBase {
     cssss: null,
     nodeLevel: 0,
     ignoreAttrs: true,
-    expander: null
+    expander: null,
   };
   static propTypes = {
     nodeLevel: Number,
     ignoreAttrs: Boolean,
   };
 
+  constructor() {
+    super();
+  }
   get tree() {
     return this.$props.tree;
   }
@@ -57,7 +60,9 @@ class TreeNode extends uiBase {
   }
 
   get expander() {
-    return this.node.expander ?? this.$props.expander ?? this.tree.$props.expander
+    return (
+      this.node.expander ?? this.$props.expander ?? this.tree.$props.expander
+    );
   }
 
   get node() {
@@ -119,8 +124,11 @@ class TreeNode extends uiBase {
     }
     this.tree.fire("nodeSelect", { node: this.node, treeNode: this });
   }
+  unselect() {
+    return this.unSelect();
+  }
   unSelect() {
-    this.tree.unSelect(this.key, false);
+    this.tree.unselect(this.key, false);
     this.updateSelf();
     this.tree.fire("nodeUnSelect", { node: this.node, treeNode: this });
   }
@@ -197,14 +205,13 @@ class TreeNode extends uiBase {
       )
     ) : null;
   }
-  install() {
-  
-  }
+  install() {}
   #Sortable;
   get Sortable() {
     return this.#Sortable;
   }
   async installed() {
+    super.installed();
     if (this.sortable) {
       const Sortable = await sortable.use();
       this.#Sortable = Sortable.create(this.$(".children"), {
@@ -264,8 +271,36 @@ class TreeNode extends uiBase {
     }
   }
   async render(props) {
+    //已Node设置的值优先
+    //每次渲染时，如果Node设置的值与当前值不一致，则更新
+    if (this.node.selected === true) {
+      this.tree.select(this.key, false);
+    }
+    if (this.node.checked === true) {
+      this.tree.check(this.key, false);
+    }
+    if (this.node.radioed === true) {
+      this.tree.radio(this.key, false);
+    }
+    if (this.node.expanded === true) {
+      this.tree.expand(this.key, false);
+    }
+
+    if (this.node.selected === false) {
+      this.tree.unselect(this.key, false);
+    }
+    if (this.node.checked === false) {
+      this.tree.uncheck(this.key, false);
+    }
+    if (this.node.radioed === false) {
+      this.tree.unradio(this.key, false);
+    }
+    if (this.node.expanded === false) {
+      this.tree.collapse(this.key, false);
+    }
+
     let { node, cssss } = props;
-    
+
     if (!this.tree.$props.multiSelect && this.selected) {
       this.tree.__selectedNode = this;
     }
@@ -293,13 +328,13 @@ class TreeNode extends uiBase {
         {this.expanded &&
           (children instanceof Array
             ? children.map((child) => (
-              <oi-tree-node
-                node={child}
-                node-level={this.level + 1}
-                tree={this.tree}
-                cssss={cssss}
-              />
-            ))
+                <oi-tree-node
+                  node={child}
+                  node-level={this.level + 1}
+                  tree={this.tree}
+                  cssss={cssss}
+                />
+              ))
             : children)}
       </div>
     );
@@ -318,7 +353,7 @@ class TreeNode extends uiBase {
           onClick={(evt) => {
             // console.log(evt)
             evt.stopPropagation();
-            if (this.selected && evt.ctrlKey === true) this.unSelect();
+            if (this.selected && evt.ctrlKey === true) this.unselect();
             else this.select();
           }}
         >
@@ -327,7 +362,9 @@ class TreeNode extends uiBase {
               evt.stopPropagation();
               this.toggle();
             }}
-            class={classNames("expander-wrap", { "no-children": this.noChildren })}
+            class={classNames("expander-wrap", {
+              "no-children": this.noChildren,
+            })}
           >
             {!this.noChildren && this.expander}
           </div>

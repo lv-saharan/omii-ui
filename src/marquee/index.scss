@@ -1,0 +1,27 @@
+:host {
+  display: block;
+  overflow: hidden;
+  white-space: nowrap;
+  border-color: red;
+  > .container {
+    display: flex;
+
+    &.horizontal {
+      flex-direction: row;
+      width: fit-content;
+      flex-wrap: nowrap;
+      justify-content: flex-start;
+    }
+    &.vertical {
+      flex-direction: column;
+      height: fit-content;
+      white-space: break-spaces;
+    }
+  }
+}
+:host([direction="up"]),
+:host([direction="down"]) {
+  white-space: initial;
+  overflow: initial;
+  overflow-y: hidden;
+}

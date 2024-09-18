@@ -33,7 +33,7 @@ import select from "./select";
 import table from "./table";
 import tinymce from "./tinymce";
 import echarts from "./echarts";
-
+import marquee from "./marquee";
 const Prefix = "oi";
 export const RateTag = `${Prefix}-rate`;
 define(RateTag, rate);
@@ -119,6 +119,8 @@ define(TinymceTag, tinymce);
 export const EchartsTag = `${Prefix}-echarts`;
 define(EchartsTag, echarts);
 
+export const MarqueeTag = `${Prefix}-marquee`;
+define(MarqueeTag, marquee);
 // define(`${Prefix}-form", form);
 customElements.define(`${Prefix}-form`, form, { extends: "form" });
 
